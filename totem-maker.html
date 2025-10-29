@@ -36,7 +36,7 @@
             color: var(--text-primary);
             display: flex;
             justify-content: center;
-            align-items: center; /* <<< CORREÇÃO APLICADA AQUI */
+            align-items: center;
             min-height: 100vh;
             padding: 20px;
             background-image:
@@ -56,7 +56,7 @@
             padding: clamp(20px, 4vw, 35px);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             animation: fadeIn 0.8s 0.2s backwards;
-            margin: 40px 0; /* Adiciona margem vertical para scroll */
+            margin: 40px 0;
         }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -209,7 +209,6 @@
         <div id="status"></div>
     </div>
 
-    <!-- Modal de Configurações -->
     <div class="modal-overlay" id="settingsModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -217,42 +216,21 @@
                 <button class="close-modal-btn" id="closeSettingsBtn">&times;</button>
             </div>
             <div class="position-settings">
-                <div class="slider-group">
-                    <label for="posX">X</label>
-                    <input type="range" id="posX" min="-40" max="0" value="-23" step="0.1">
-                    <span class="slider-value" id="posXValue">-23.0</span>
-                </div>
-                <div class="slider-group">
-                    <label for="posY">Y</label>
-                    <input type="range" id="posY" min="-10" max="20" value="6.8" step="0.1">
-                    <span class="slider-value" id="posYValue">6.8</span>
-                </div>
-                <div class="slider-group">
-                    <label for="posZ">Z</label>
-                    <input type="range" id="posZ" min="0" max="20" value="11" step="0.1">
-                    <span class="slider-value" id="posZValue">11.0</span>
-                </div>
-                 <div class="slider-group">
-                    <label for="scale">Escala</label>
-                    <input type="range" id="scale" min="1" max="8" value="3.2" step="0.1">
-                    <span class="slider-value" id="scaleValue">3.2</span>
-                </div>
+                <div class="slider-group"><label for="posX">X</label><input type="range" id="posX" min="-40" max="0" value="-23" step="0.1"><span class="slider-value" id="posXValue">-23.0</span></div>
+                <div class="slider-group"><label for="posY">Y</label><input type="range" id="posY" min="-10" max="20" value="6.8" step="0.1"><span class="slider-value" id="posYValue">6.8</span></div>
+                <div class="slider-group"><label for="posZ">Z</label><input type="range" id="posZ" min="0" max="20" value="11" step="0.1"><span class="slider-value" id="posZValue">11.0</span></div>
+                 <div class="slider-group"><label for="scale">Escala</label><input type="range" id="scale" min="1" max="8" value="3.2" step="0.1"><span class="slider-value" id="scaleValue">3.2</span></div>
             </div>
         </div>
     </div>
 
     <div class="social-links">
-        <a href="https://www.tiktok.com/@spiritmcp" target="_blank" rel="noopener noreferrer" class="social-icon" title="TikTok">
-            <i class="fab fa-tiktok"></i>
-        </a>
-        <a href="https://discord.gg/xSgM9BbD9p" class="social-icon" title="Discord">
-            <i class="fab fa-discord"></i>
-        </a>
+        <a href="https://www.tiktok.com/@spiritmcp" target="_blank" rel="noopener noreferrer" class="social-icon" title="TikTok"><i class="fab fa-tiktok"></i></a>
+        <a href="https://discord.gg/xSgM9BbD9p" class="social-icon" title="Discord"><i class="fab fa-discord"></i></a>
     </div>
 
     <script>
-        // --- TEMPLATES DE TEXTO BRUTO (EMULANDO ARQUIVOS LOCAIS DO C#) ---
-        const manifestTemplate = `{"format_version":2,"header":{"name":"__PACK_NAME__","description":"§5 §lorodo on Top / spiritmcp on tiktok","uuid":"__UUID_1__","version":[0,0,1],"min_engine_version":[1,21,0]},"modules":[{"description":"§5 §lorodo on Top / spiritmcp on tiktok","type":"resources","uuid":"__UUID_2__","version":[0,0,1]}]}`;
+        const manifestTemplate = `{"format_version":2,"header":{"name":"__PACK_NAME__","description":"§5 §lpowered by Luna. / spiritmcp on tiktok","uuid":"__UUID_1__","version":[0,0,1],"min_engine_version":[1,21,0]},"modules":[{"description":"§5 §lorodo on Top / spiritmcp on tiktok","type":"resources","uuid":"__UUID_2__","version":[0,0,1]}]}`;
         const totemTemplate = `{"format_version":"1.10.0","minecraft:attachable":{"description":{"identifier":"minecraft:totem_of_undying","materials":{"default":"entity_alphatest","enchanted":"entity_alphatest_glint"},"textures":{__TEXTURE_LIST__"enchanted":"textures/misc/enchanted_item_glint"},"geometry":{"default":"geometry.vm"},"animations":{"wield":"animation.leftblock.first_person_wield"},"scripts":{"animate":["wield"]},"render_controllers":["controller.render.item_animation_totem"]}}}`;
         const renderControllerTemplate = `{"format_version":"1.10","render_controllers":{"controller.render.item_animation_totem":{"arrays":{"textures":{"array.item_frames":[__FRAME_ARRAY__]}},"geometry":"Geometry.default","materials":[{"*":"variable.is_enchanted ? material.enchanted : material.default"}],"textures":["temp.life_time = query.life_time * __FPS_VALUE__; return array.item_frames[temp.life_time];","texture.enchanted"]}}}`;
         const animationTemplate = `{"format_version":"1.10.0","animations":{"animation.leftblock.first_person_wield":{"loop":true,"bones":{"leftitem":{"rotation":["c.is_first_person?-15.0:100.0","c.is_first_person?30.0:20.0","c.is_first_person?4.0:80.0"],"position":["c.is_first_person?__POS_X__:-6.2","c.is_first_person?__POS_Y__:7.0","c.is_first_person?__POS_Z__:4.0"],"scale":["c.is_first_person?__SCALE__:5","c.is_first_person?__SCALE__:5","c.is_first_person?__SCALE__:5"]}}}}}`;
@@ -360,7 +338,7 @@
                     .replace('__POS_X__', parseFloat(posXSlider.value).toFixed(1))
                     .replace('__POS_Y__', parseFloat(posYSlider.value).toFixed(1))
                     .replace('__POS_Z__', parseFloat(posZSlider.value).toFixed(1))
-                    .replace('__SCALE__', parseFloat(scaleSlider.value).toFixed(1));
+                    .replace(/__SCALE__/g, parseFloat(scaleSlider.value).toFixed(1)); // CORREÇÃO AQUI
 
                 statusDiv.textContent = 'Compactando o pacote...';
                 const zip = new JSZip();
@@ -415,6 +393,11 @@
                 setTimeout(() => { window.location.href = destination; }, 500);
             });
         });
+    </script>
+
+</body>
+</html>
+         
     </script>
 
 </body>
