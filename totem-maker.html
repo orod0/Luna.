@@ -3,404 +3,467 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luna Hub - Texture Maker</title>
+    <title>Luna Hub - Totem Creator</title>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-md5/build/md5.min.js"></script> 
+    <script src="gif.js"></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display-swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         :root {
-            --dark-space: #0A0A10; --deep-purple: #7B42F6; --light-purple: #A78BFA;
-            --glow-color: rgba(123, 66, 246, 0.2); --glass-bg: rgba(18, 18, 28, 0.6);
-            --border-color: rgba(123, 66, 246, 0.2); --text-primary: #EDE9FE; --text-secondary: #A1A1AA;
-            --input-bg: rgba(30, 30, 45, 0.7); --card-bg: rgba(22, 22, 34, 0.7);
-            --transition-fast: all 0.3s ease;
+            --dark-space: #0A0A10;
+            --deep-purple: #7B42F6;
+            --light-purple: #A78BFA;
+            --glow-color: rgba(123, 66, 246, 0.2);
+            --glass-bg: rgba(18, 18, 28, 0.6);
+            --border-color: rgba(123, 66, 246, 0.2);
+            --text-primary: #EDE9FE;
+            --text-secondary: #A1A1AA;
+            --input-bg: rgba(30, 30, 45, 0.7);
+            --card-bg: rgba(22, 22, 34, 0.7);
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Manrope', sans-serif; background-color: var(--dark-space); color: var(--text-primary);
-            min-height: 100vh; padding: clamp(20px, 4vw, 40px);
-            background-image: radial-gradient(ellipse 50% 60% at 20% 0%, var(--glow-color), transparent),
-                              radial-gradient(ellipse 50% 60% at 80% 100%, var(--glow-color), transparent);
+            font-family: 'Manrope', sans-serif;
+            background-color: var(--dark-space);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background-image:
+                radial-gradient(ellipse 40% 50% at 20% 0%, var(--glow-color), transparent),
+                radial-gradient(ellipse 40% 50% at 80% 100%, var(--glow-color), transparent);
             background-attachment: fixed;
+            overflow-y: auto;
         }
-        .container { width: 100%; max-width: 1200px; margin: 0 auto; animation: fadeIn 0.8s 0.2s backwards; }
+
+        .main-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 40px 0;
+        }
+
+        .creator-card {
+            width: 100%;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: clamp(20px, 4vw, 35px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s 0.2s backwards;
+        }
+        
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card-header { text-align: center; margin-bottom: 25px; }
+        .card-header h1 { font-size: clamp(1.8rem, 7vw, 2.3rem); font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(90deg, #FFFFFF, #D1C4E9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; }
+        .card-header h1 span { background: linear-gradient(90deg, var(--light-purple), var(--deep-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .card-header p { color: var(--text-secondary); font-size: clamp(0.9rem, 3vw, 1rem); }
         
-        h1, h2 { font-weight: 700; text-shadow: 0 0 10px var(--glow-color); }
-        h1 span { color: var(--light-purple); }
+        .input-group { margin-bottom: 18px; }
+        .label-wrapper { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .label-wrapper .actions { display: flex; gap: 5px; }
+        label { font-weight: 600; font-size: 0.95rem; color: var(--text-secondary); }
 
-        .pack-info-section {
-            background: var(--glass-bg); backdrop-filter: blur(10px); border-radius: 20px;
-            padding: 30px; border: 1px solid var(--border-color); margin-bottom: 30px;
-            display: grid; grid-template-columns: auto 1fr; gap: 20px 30px; align-items: center;
+        .file-input-wrapper {
+            position: relative; background: var(--input-bg); border: 1px dashed var(--border-color); border-radius: 12px;
+            padding: 15px; display: flex; align-items: center; cursor: pointer; transition: background-color 0.3s, border-color 0.3s;
+            min-height: 80px;
         }
-        .pack-icon-wrapper {
-            grid-row: 1 / 3; width: 128px; height: 128px; background: var(--input-bg);
-            border: 1px dashed var(--border-color); border-radius: 16px; display: flex;
-            align-items: center; justify-content: center; cursor: pointer; transition: var(--transition-fast);
-        }
-        .pack-icon-wrapper:hover { border-color: var(--light-purple); }
-        .pack-icon-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; }
-        .pack-icon-wrapper .icon { font-size: 2rem; color: var(--text-secondary); }
+        .file-input-wrapper:hover { background-color: rgba(30, 30, 45, 1); border-color: var(--light-purple); }
+        input[type="file"] { position: absolute; width: 100%; height: 100%; left: 0; top: 0; opacity: 0; cursor: pointer; }
+        .file-input-wrapper img { width: 50px; height: 50px; margin-right: 15px; object-fit: contain; background: rgba(0,0,0,0.2); border-radius: 8px; flex-shrink: 0; transition: transform 0.3s ease; }
+        .file-input-wrapper img.is-flipped { transform: scaleX(-1); }
+        .file-input-text { color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.95rem; flex: 1; }
+        .file-input-text.selected { color: var(--text-primary); font-weight: 500; }
         
-        .input-group { display: flex; flex-direction: column; gap: 8px; }
-        label { font-weight: 500; color: var(--text-secondary); font-size: 0.9rem; }
-        input, select, textarea {
-            width: 100%; padding: 12px; background-color: var(--input-bg);
-            border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-primary);
-            font-size: 1rem; font-family: 'Manrope', sans-serif; transition: var(--transition-fast);
-        }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--light-purple); box-shadow: 0 0 10px var(--glow-color); }
-
-        .maker-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; height: 65vh; }
-        .selection-panel, .editor-panel {
-            background: var(--glass-bg); backdrop-filter: blur(10px);
-            border: 1px solid var(--border-color); border-radius: 20px;
-            padding: 30px; display: flex; flex-direction: column;
-        }
-
-        .search-box { position: relative; margin-bottom: 20px; }
-        .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
-        #searchTexture { padding-left: 45px; }
-
-        .texture-selection-list { overflow-y: auto; flex-grow: 1; padding-right: 10px; }
-        .texture-item {
-            display: flex; align-items: center; gap: 15px; padding: 10px; border-radius: 10px;
-            cursor: pointer; transition: var(--transition-fast); border: 2px solid transparent;
-        }
-        .texture-item:hover { background: var(--input-bg); }
-        .texture-item.selected { border-color: var(--deep-purple); background: var(--input-bg); }
-        .texture-item.modified { border-color: var(--light-purple); }
-        .texture-item img { width: 48px; height: 48px; background: rgba(0,0,0,0.2); border-radius: 6px; image-rendering: pixelated; }
-
-        .editor-panel .placeholder { margin: auto; text-align: center; color: var(--text-secondary); }
-        .editor-panel .placeholder .icon { font-size: 3rem; margin-bottom: 15px; }
-        .editor-content { display: none; }
-        .editor-content h3 { margin-bottom: 20px; }
-        .preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: center; }
-        .preview-box { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 20px; background: var(--input-bg); border-radius: 12px; }
-        .preview-box h4 { font-size: 0.9rem; color: var(--text-secondary); }
-        .preview-box img { width: 128px; height: 128px; object-fit: contain; image-rendering: pixelated; }
-        .upload-texture-label {
-            margin-top: 15px; background: var(--deep-purple); padding: 10px 20px;
-            border-radius: 8px; cursor: pointer; transition: var(--transition-fast);
-        }
-        .upload-texture-label:hover { background-color: var(--light-purple); }
-
-        .btn-primary { padding: 15px; border: none; border-radius: 12px; cursor: pointer; background: var(--deep-purple); color: var(--text-primary); font-size: 1.2rem; font-weight: 700; transition: var(--transition-fast); width: 100%; margin-top: 30px; }
-        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 0 20px var(--glow-color); }
+        input[type="text"] { width: 100%; padding: 16px; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-primary); font-size: 1rem; font-family: 'Manrope', sans-serif; transition: border-color 0.3s, box-shadow 0.3s; }
+        input[type="text"]:focus { outline: none; border-color: var(--light-purple); box-shadow: 0 0 10px var(--glow-color); }
         
-        .page-transition{position:fixed;top:0;left:0;width:100%;height:100%;background-color:var(--deep-purple);z-index:9999;transform-origin:bottom;pointer-events:none}.page-transition.animate-in{transform:scaleY(1);animation:slideIn .5s ease-in-out forwards}.page-transition.animate-out{transform:scaleY(0);animation:slideOut .5s ease-in-out forwards}@keyframes slideIn{from{transform:scaleY(1);transform-origin:top}to{transform:scaleY(0);transform-origin:top}}@keyframes slideOut{from{transform:scaleY(0);transform-origin:bottom}to{transform:scaleY(1);transform-origin:bottom}}.back-to-hub{position:fixed;bottom:25px;left:25px;background:var(--deep-purple);color:var(--text-primary);padding:12px 20px;border-radius:12px;text-decoration:none;font-weight:600;z-index:1001;box-shadow:0 0 20px var(--glow-color);transition:all .3s ease;display:flex;align-items:center;gap:8px}.back-to-hub:hover{transform:translateY(-3px);box-shadow:0 0 30px var(--glow-color)}.social-links{position:fixed;bottom:25px;right:25px;display:flex;flex-direction:column;gap:15px;z-index:1000}.social-icon{display:flex;align-items:center;justify-content:center;width:50px;height:50px;background:var(--card-bg);border:1px solid var(--border-color);border-radius:50%;color:var(--text-secondary);font-size:1.5rem;text-decoration:none;transition:all .4s ease;backdrop-filter:blur(10px)}.social-icon:hover{color:var(--text-primary);background-color:var(--deep-purple);transform:translateY(-5px);box-shadow:0 0 20px var(--glow-color);border-color:var(--light-purple)}
+        .settings-btn { background: none; border: none; cursor: pointer; padding: 8px; display: flex; align-items: center; justify-content: center; opacity: 0.5; transition: opacity 0.3s, color 0.3s; color: var(--text-secondary); border-radius: 6px; min-width: 44px; min-height: 44px; }
+        .settings-btn:hover { opacity: 1; }
+        .settings-btn.active { opacity: 1; color: var(--light-purple); }
+        .settings-btn svg, .settings-btn i { width: 22px; height: 22px; font-size: 20px; }
+
+        .number-input-wrapper { display: flex; align-items: center; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; transition: border-color 0.3s, box-shadow 0.3s; }
+        .number-input-wrapper:focus-within { border-color: var(--light-purple); box-shadow: 0 0 10px var(--glow-color); }
+        input[type="number"] { width: 100%; padding: 16px; background: none; border: none; color: var(--text-primary); font-size: 1rem; font-family: 'Manrope', sans-serif; -moz-appearance: textfield; text-align: center; }
+        input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type="number"]:focus { outline: none; }
+        .num-btn { background: rgba(255,255,255,0.05); color: var(--text-secondary); border: none; padding: 0 20px; font-size: 1.5rem; font-weight: 600; cursor: pointer; align-self: stretch; transition: background-color 0.3s, color 0.3s; touch-action: manipulation; min-height: 60px; }
+        .num-btn:hover { background: var(--deep-purple); color: white; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 10, 16, 0.5); backdrop-filter: blur(8px);
+            z-index: 2000; display: flex; justify-content: center; align-items: center;
+            padding: 20px; opacity: 0; visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.is-open { opacity: 1; visibility: visible; }
         
-        @media (max-width: 900px) {
-            .maker-grid { grid-template-columns: 1fr; height: auto; }
-            .selection-panel { height: 40vh; }
+        .modal-content {
+            position: relative; width: 100%; max-width: 500px;
+            background: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 16px; padding: 30px;
+            transform: scale(0.95); transition: transform 0.3s ease;
         }
-        @media (max-width: 600px) {
-            .pack-info-section { grid-template-columns: 1fr; }
-            .pack-icon-wrapper { grid-row: 1; width: 100%; }
+        .modal-overlay.is-open .modal-content { transform: scale(1); }
+        
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h2 { font-size: 1.5rem; }
+        .close-modal-btn { background: none; border: none; color: var(--text-secondary); font-size: 1.8rem; cursor: pointer; transition: color 0.3s; padding: 5px; line-height: 1; }
+        .close-modal-btn:hover { color: var(--text-primary); }
+
+        .position-settings { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .slider-group { display: flex; align-items: center; gap: 15px; }
+        .slider-group label { flex-basis: 30px; font-weight: 700; color: var(--text-primary); }
+        .slider-group input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; background: var(--input-bg); border-radius: 5px; outline: none; transition: background 0.3s; }
+        .slider-group input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; background: var(--light-purple); cursor: pointer; border-radius: 50%; border: 3px solid var(--dark-space); }
+        .slider-group input[type="range"]::-moz-range-thumb { width: 20px; height: 20px; background: var(--light-purple); cursor: pointer; border-radius: 50%; border: 3px solid var(--dark-space); }
+        .slider-value { font-weight: 600; color: var(--text-secondary); min-width: 45px; text-align: right; }
+
+        .download-btn { width: 100%; padding: 18px; margin-top: 25px; background: var(--deep-purple); color: var(--text-primary); border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; text-decoration: none; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 0 20px rgba(123, 66, 246, 0.4); min-height: 60px; display: flex; align-items: center; justify-content: center; }
+        .download-btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 0 30px rgba(123, 66, 246, 0.6); }
+        .download-btn:disabled { background: #333; color: #777; cursor: not-allowed; box-shadow: none; }
+        
+        #status { text-align: center; margin-top: 20px; min-height: 22px; color: var(--light-purple); font-weight: 500; transition: color 0.3s; font-size: 0.95rem; padding: 0 10px; }
+        
+        .page-transition { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--deep-purple); z-index: 9999; transform-origin: bottom; pointer-events: none; }
+        .page-transition.animate-in { transform: scaleY(1); animation: slideIn 0.5s ease-in-out forwards; }
+        .page-transition.animate-out { transform: scaleY(0); animation: slideOut 0.5s ease-in-out forwards; }
+        @keyframes slideIn { from { transform: scaleY(1); transform-origin: top; } to { transform: scaleY(0); transform-origin: top; } }
+        @keyframes slideOut { from { transform: scaleY(0); transform-origin: bottom; } to { transform: scaleY(1); transform-origin: bottom; } }
+
+        .back-to-hub { position: fixed; bottom: 25px; left: 25px; background: var(--deep-purple); color: var(--text-primary); padding: 12px 20px; border-radius: 12px; text-decoration: none; font-weight: 600; z-index: 1001; box-shadow: 0 0 20px rgba(123, 66, 246, 0.4); transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; }
+        .back-to-hub:hover { transform: translateY(-3px); box-shadow: 0 0 30px rgba(123, 66, 246, 0.6); }
+
+        .social-links { position: fixed; bottom: 25px; right: 25px; display: flex; flex-direction: column; gap: 15px; z-index: 1000; }
+        .social-icon { display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 50%; color: var(--text-secondary); font-size: 1.5rem; text-decoration: none; transition: all 0.4s ease; backdrop-filter: blur(10px); }
+        .social-icon:hover { color: var(--text-primary); background-color: var(--deep-purple); transform: translateY(-5px); box-shadow: 0 0 20px var(--glow-color); border-color: var(--light-purple); }
+        
+        /* --- ESTILOS DO PAINEL DE HISTÓRICO --- */
+        #historyPanel {
+            position: absolute; top: 0; left: calc(100% + 20px); width: 300px;
+            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px;
+            padding: 20px; z-index: 100; opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease; transform: translateX(20px);
+            max-height: 80vh; display: flex; flex-direction: column;
         }
+        #historyPanel.is-visible { opacity: 1; transform: translateX(0); pointer-events: auto; }
+        .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .history-header h3 { font-size: 1.2rem; }
+        #clearHistoryBtn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.8rem; text-decoration: underline; }
+        #historyList { list-style: none; overflow-y: auto; flex-grow: 1; }
+        .history-item { display: flex; align-items: center; gap: 15px; padding: 10px; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; }
+        .history-item:hover { background-color: var(--input-bg); }
+        .history-item img { width: 40px; height: 40px; border-radius: 6px; object-fit: contain; flex-shrink: 0; }
+        .history-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        #noHistoryMessage { text-align: center; color: var(--text-secondary); padding: 20px 0; }
+
+        @media (max-width: 1000px) {
+             #historyPanel {
+                position: static; transform: none; width: auto; margin-top: 20px; max-height: 300px;
+             }
+             #historyPanel.is-visible { transform: none; }
+        }
+        @media (max-width: 480px) { .back-to-hub { padding: 10px 15px; font-size: 0.9rem; bottom: 15px; left: 15px; } .social-links { bottom: 15px; right: 15px; gap: 12px; } .social-icon { width: 45px; height: 45px; font-size: 1.3rem; } }
     </style>
 </head>
 <body>
-
     <div class="page-transition" id="pageTransition"></div>
     <a href="index.html" class="back-to-hub nav-link"><i class="fas fa-arrow-left"></i> Voltar ao Hub</a>
 
-    <div class="container">
-        <header style="text-align: center; margin-bottom: 20px;">
-            <h1>Texture <span>Maker</span></h1>
-        </header>
+    <div class="main-wrapper">
+        <div class="creator-card">
+            <div class="card-header">
+                <h1>Luna <span>Totem Creator</span></h1>
+                <p>A forma definitiva para criar totens animados em segundos.</p>
+            </div>
 
-        <section class="pack-info-section">
-            <label for="packIconInput" class="pack-icon-wrapper">
-                <img id="packIconPreview" src="" alt="Pack Icon Preview" style="display:none;">
-                <div class="icon" id="packIconPlaceholder"><i class="fas fa-image"></i></div>
-            </label>
-            <input type="file" id="packIconInput" accept=".png" style="display:none;">
             <div class="input-group">
-                <label for="packName">Nome do Pacote</label>
-                <input type="text" id="packName" placeholder="Ex: Meu Pacote de Texturas">
-            </div>
-            <div class="input-group">
-                <label for="packDesc">Descrição do Pacote</label>
-                <input type="text" id="packDesc" placeholder="Ex: Texturas para PvP">
-            </div>
-        </section>
-
-        <main class="maker-grid">
-            <div class="selection-panel">
-                <h2 id="textureListHeader">Itens e Blocos</h2>
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="searchTexture" placeholder="Buscar textura...">
-                </div>
-                <div class="texture-selection-list" id="textureList">
-                     <!-- Itens serão carregados aqui -->
-                </div>
-            </div>
-            <aside class="editor-panel" id="editorPanel">
-                <div class="placeholder">
-                    <div class="icon"><i class="fas fa-arrow-left"></i></div>
-                    <h3>Selecione um item da lista</h3>
-                    <p>Clique em um item à esquerda para começar a editar.</p>
-                </div>
-                <div class="editor-content">
-                    <h3 id="editingItemName"></h3>
-                    <div class="preview-grid">
-                        <div class="preview-box">
-                            <h4>Original</h4>
-                            <img id="originalTexture" src="">
-                        </div>
-                         <div class="preview-box">
-                            <h4>Sua Textura</h4>
-                            <img id="newTexture" src="">
-                            <label for="textureUpload" class="upload-texture-label">
-                                <i class="fas fa-upload"></i> Escolher Arquivo PNG
-                            </label>
-                            <input type="file" id="textureUpload" accept=".png" style="display: none;">
-                        </div>
+                <div class="label-wrapper">
+                    <label>1. Escolha seu GIF Animado</label>
+                    <div class="actions">
+                        <button class="settings-btn" id="flipBtn" title="Inverter GIF"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="margin-left: -10px; margin-right: 2px;"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></button>
+                        <button class="settings-btn" id="openSettingsBtn" title="Configurações de Posição"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.438.995s.145.755.438.995l1.003.827c.424.35.534.954.26 1.431l-1.296 2.247a1.125 1.125 0 01-1.37.49l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.063-.374-.313-.686-.645-.87a6.52 6.52 0 01-.22-.127c-.324-.196-.72-.257-1.075-.124l-1.217.456a1.125 1.125 0 01-1.37-.49l-1.296-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.437-.995s-.145-.755-.437-.995l-1.004-.827a1.125 1.125 0 01-.26-1.431l1.296-2.247a1.125 1.125 0 011.37-.49l1.217.456c.355.133.75.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg></button>
+                        <button class="settings-btn" id="historyBtn" title="Histórico de Criações"><i class="fas fa-history"></i></button>
                     </div>
                 </div>
-            </aside>
-        </main>
-        
-        <button id="createPackBtn" class="btn-primary"><i class="fas fa-file-archive"></i> Criar e Baixar .mcpack</button>
-        <p id="status" style="text-align: center; margin-top: 15px; color: var(--text-secondary);"></p>
+                <div class="file-input-wrapper"><input type="file" id="gifFile" accept=".gif"><img id="gifPreview" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="GIF Preview"><span id="gifFileName" class="file-input-text">Clique para selecionar um arquivo...</span></div>
+            </div>
+            <div class="input-group">
+                <label>2. Escolha o Ícone do Pacote (PNG)</label>
+                <div class="file-input-wrapper"><input type="file" id="packIcon" accept=".png"><img id="iconPreview" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Icon Preview"><span id="iconFileName" class="file-input-text">Clique para selecionar um arquivo...</span></div>
+            </div>
+            <div class="input-group"><label for="packName">3. Dê um nome ao Pacote</label><input type="text" id="packName" placeholder="Ex: MeuTotemRoxo"></div>
+            <div class="input-group">
+                <label for="packFps">4. Defina o FPS (Velocidade)</label>
+                <div class="number-input-wrapper">
+                    <button class="num-btn" id="fps-decrement">-</button><input type="number" id="packFps" value="20" min="1" max="120"><button class="num-btn" id="fps-increment">+</button>
+                </div>
+            </div>
+            <button id="downloadBtn" class="download-btn" disabled>Preencha todos os campos</button>
+            <div id="status"></div>
+        </div>
 
+        <!-- PAINEL DE HISTÓRICO -->
+        <div id="historyPanel">
+            <div class="history-header">
+                <h3>Histórico</h3>
+                <button id="clearHistoryBtn">Limpar</button>
+            </div>
+            <ul id="historyList">
+                <li id="noHistoryMessage">Nenhum totem salvo ainda.</li>
+            </ul>
+        </div>
     </div>
 
-    <div class="social-links">
-        <a href="https://www.tiktok.com/@spiritmcp" target="_blank" rel="noopener noreferrer" class="social-icon" title="TikTok"><i class="fab fa-tiktok"></i></a>
-        <a href="https://discord.gg/xSgM9BbD9p" class="social-icon" title="Discord"><i class="fab fa-discord"></i></a>
-    </div>
+    <div class="modal-overlay" id="settingsModal"><div class="modal-content"><div class="modal-header"><h2>Posição do Totem (1ª Pessoa)</h2><button class="close-modal-btn" id="closeSettingsBtn">&times;</button></div><div class="position-settings"><div class="slider-group"><label for="posX">X</label><input type="range" id="posX" min="-40" max="0" value="-23" step="0.1"><span class="slider-value" id="posXValue">-23.0</span></div><div class="slider-group"><label for="posY">Y</label><input type="range" id="posY" min="-10" max="20" value="6.8" step="0.1"><span class="slider-value" id="posYValue">6.8</span></div><div class="slider-group"><label for="posZ">Z</label><input type="range" id="posZ" min="0" max="20" value="11" step="0.1"><span class="slider-value" id="posZValue">11.0</span></div><div class="slider-group"><label for="scale">Escala</label><input type="range" id="scale" min="1" max="8" value="3.2" step="0.1"><span class="slider-value" id="scaleValue">3.2</span></div></div></div></div>
+    <div class="social-links"><a href="https://www.tiktok.com/@spiritmcp" target="_blank" rel="noopener noreferrer" class="social-icon" title="TikTok"><i class="fab fa-tiktok"></i></a><a href="#" class="social-icon" title="Discord"><i class="fab fa-discord"></i></a></div>
 
     <script>
-        const textureDatabase = [
-            // Blocos Comuns
-            {id:'block_stone',name:'Pedra',path:'textures/blocks/stone.png'},
-            {id:'block_cobblestone',name:'Pedregulho',path:'textures/blocks/cobblestone.png'},
-            {id:'block_dirt',name:'Terra',path:'textures/blocks/dirt.png'},
-            {id:'block_grass',name:'Bloco de Grama (Topo)',path:'textures/blocks/grass_top.png'},
-            {id:'block_sand',name:'Areia',path:'textures/blocks/sand.png'},
-            {id:'block_gravel',name:'Cascalho',path:'textures/blocks/gravel.png'},
-            {id:'block_log_oak',name:'Tora de Carvalho',path:'textures/blocks/log_oak.png'},
-            {id:'block_log_spruce',name:'Tora de Pinheiro',path:'textures/blocks/log_spruce.png'},
-            {id:'block_log_birch',name:'Tora de Bétula',path:'textures/blocks/log_birch.png'},
-            {id:'block_log_jungle',name:'Tora da Selva',path:'textures/blocks/log_jungle.png'},
-            {id:'block_leaves_oak',name:'Folhas de Carvalho',path:'textures/blocks/leaves_oak.png'},
-            {id:'block_planks_oak',name:'Tábuas de Carvalho',path:'textures/blocks/planks_oak.png'},
-            {id:'block_crafting_table',name:'Bancada de Trabalho',path:'textures/blocks/crafting_table_front.png'},
-            {id:'block_furnace',name:'Fornalha (Frente)',path:'textures/blocks/furnace_front_off.png'},
-            {id:'block_chest',name:'Baú (Frente)',path:'textures/entity/chest/normal.png'},
-            {id:'block_glass',name:'Vidro',path:'textures/blocks/glass.png'},
-            {id:'block_wool_white',name:'Lã Branca',path:'textures/blocks/wool_colored_white.png'},
-
-            // Minérios
-            {id:'block_coal_ore',name:'Minério de Carvão',path:'textures/blocks/coal_ore.png'},
-            {id:'block_iron_ore',name:'Minério de Ferro',path:'textures/blocks/iron_ore.png'},
-            {id:'block_gold_ore',name:'Minério de Ouro',path:'textures/blocks/gold_ore.png'},
-            {id:'block_lapis_ore',name:'Minério de Lápis-lazúli',path:'textures/blocks/lapis_ore.png'},
-            {id:'block_redstone_ore',name:'Minério de Redstone',path:'textures/blocks/redstone_ore.png'},
-            {id:'block_diamond_ore',name:'Minério de Diamante',path:'textures/blocks/diamond_ore.png'},
-            {id:'block_emerald_ore',name:'Minério de Esmeralda',path:'textures/blocks/emerald_ore.png'},
-            {id:'block_ancient_debris',name:'Detritos Ancestrais',path:'textures/blocks/ancient_debris_side.png'},
-            
-            // Blocos Valiosos
-            {id:'block_coal_block',name:'Bloco de Carvão',path:'textures/blocks/coal_block.png'},
-            {id:'block_iron_block',name:'Bloco de Ferro',path:'textures/blocks/iron_block.png'},
-            {id:'block_gold_block',name:'Bloco de Ouro',path:'textures/blocks/gold_block.png'},
-            {id:'block_lapis_block',name:'Bloco de Lápis-lazúli',path:'textures/blocks/lapis_block.png'},
-            {id:'block_redstone_block',name:'Bloco de Redstone',path:'textures/blocks/redstone_block.png'},
-            {id:'block_diamond_block',name:'Bloco de Diamante',path:'textures/blocks/diamond_block.png'},
-            {id:'block_emerald_block',name:'Bloco de Esmeralda',path:'textures/blocks/emerald_block.png'},
-            {id:'block_netherite_block',name:'Bloco de Netherita',path:'textures/blocks/netherite_block.png'},
-            
-            // Itens de Comida
-            {id:'item_apple',name:'Maçã',path:'textures/items/apple.png'},
-            {id:'item_golden_apple',name:'Maçã Dourada',path:'textures/items/apple_golden.png'},
-            {id:'item_bread',name:'Pão',path:'textures/items/bread.png'},
-            {id:'item_porkchop_cooked',name:'Bisteca de Porco Assada',path:'textures/items/porkchop_cooked.png'},
-            {id:'item_beef_cooked',name:'Bife',path:'textures/items/beef_cooked.png'},
-            {id:'item_chicken_cooked',name:'Frango Assado',path:'textures/items/chicken_cooked.png'},
-            {id:'item_carrot',name:'Cenoura',path:'textures/items/carrot.png'},
-            {id:'item_golden_carrot',name:'Cenoura Dourada',path:'textures/items/carrot_golden.png'},
-            {id:'item_melon',name:'Melancia',path:'textures/items/melon.png'},
-
-            // Ferramentas de Madeira
-            {id:'item_wood_sword',name:'Espada de Madeira',path:'textures/items/wood_sword.png'},
-            {id:'item_wood_pickaxe',name:'Picareta de Madeira',path:'textures/items/wood_pickaxe.png'},
-            {id:'item_wood_axe',name:'Machado de Madeira',path:'textures/items/wood_axe.png'},
-            {id:'item_wood_shovel',name:'Pá de Madeira',path:'textures/items/wood_shovel.png'},
-            {id:'item_wood_hoe',name:'Enxada de Madeira',path:'textures/items/wood_hoe.png'},
-            // Ferramentas de Pedra
-            {id:'item_stone_sword',name:'Espada de Pedra',path:'textures/items/stone_sword.png'},
-            {id:'item_stone_pickaxe',name:'Picareta de Pedra',path:'textures/items/stone_pickaxe.png'},
-            {id:'item_stone_axe',name:'Machado de Pedra',path:'textures/items/stone_axe.png'},
-            {id:'item_stone_shovel',name:'Pá de Pedra',path:'textures/items/stone_shovel.png'},
-            {id:'item_stone_hoe',name:'Enxada de Pedra',path:'textures/items/stone_hoe.png'},
-            // Ferramentas de Ferro
-            {id:'item_iron_sword',name:'Espada de Ferro',path:'textures/items/iron_sword.png'},
-            {id:'item_iron_pickaxe',name:'Picareta de Ferro',path:'textures/items/iron_pickaxe.png'},
-            {id:'item_iron_axe',name:'Machado de Ferro',path:'textures/items/iron_axe.png'},
-            {id:'item_iron_shovel',name:'Pá de Ferro',path:'textures/items/iron_shovel.png'},
-            {id:'item_iron_hoe',name:'Enxada de Ferro',path:'textures/items/iron_hoe.png'},
-            // Ferramentas de Ouro
-            {id:'item_gold_sword',name:'Espada de Ouro',path:'textures/items/gold_sword.png'},
-            {id:'item_gold_pickaxe',name:'Picareta de Ouro',path:'textures/items/gold_pickaxe.png'},
-            {id:'item_gold_axe',name:'Machado de Ouro',path:'textures/items/gold_axe.png'},
-            {id:'item_gold_shovel',name:'Pá de Ouro',path:'textures/items/gold_shovel.png'},
-            {id:'item_gold_hoe',name:'Enxada de Ouro',path:'textures/items/gold_hoe.png'},
-            // Ferramentas de Diamante
-            {id:'item_diamond_sword',name:'Espada de Diamante',path:'textures/items/diamond_sword.png'},
-            {id:'item_diamond_pickaxe',name:'Picareta de Diamante',path:'textures/items/diamond_pickaxe.png'},
-            {id:'item_diamond_axe',name:'Machado de Diamante',path:'textures/items/diamond_axe.png'},
-            {id:'item_diamond_shovel',name:'Pá de Diamante',path:'textures/items/diamond_shovel.png'},
-            {id:'item_diamond_hoe',name:'Enxada de Diamante',path:'textures/items/diamond_hoe.png'},
-            // Ferramentas de Netherita
-            {id:'item_netherite_sword',name:'Espada de Netherita',path:'textures/items/netherite_sword.png'},
-            {id:'item_netherite_pickaxe',name:'Picareta de Netherita',path:'textures/items/netherite_pickaxe.png'},
-            {id:'item_netherite_axe',name:'Machado de Netherita',path:'textures/items/netherite_axe.png'},
-            {id:'item_netherite_shovel',name:'Pá de Netherita',path:'textures/items/netherite_shovel.png'},
-            {id:'item_netherite_hoe',name:'Enxada de Netherita',path:'textures/items/netherite_hoe.png'},
-
-            // Armaduras de Couro
-            {id:'item_leather_helmet',name:'Capacete de Couro',path:'textures/items/leather_helmet.png'},
-            {id:'item_leather_chestplate',name:'Túnica de Couro',path:'textures/items/leather_chestplate.png'},
-            {id:'item_leather_leggings',name:'Calças de Couro',path:'textures/items/leather_leggings.png'},
-            {id:'item_leather_boots',name:'Botas de Couro',path:'textures/items/leather_boots.png'},
-            // Armaduras de Ferro
-            {id:'item_iron_helmet',name:'Capacete de Ferro',path:'textures/items/iron_helmet.png'},
-            {id:'item_iron_chestplate',name:'Peitoral de Ferro',path:'textures/items/iron_chestplate.png'},
-            {id:'item_iron_leggings',name:'Perneiras de Ferro',path:'textures/items/iron_leggings.png'},
-            {id:'item_iron_boots',name:'Botas de Ferro',path:'textures/items/iron_boots.png'},
-            // Armaduras de Ouro
-            {id:'item_gold_helmet',name:'Capacete de Ouro',path:'textures/items/gold_helmet.png'},
-            {id:'item_gold_chestplate',name:'Peitoral de Ouro',path:'textures/items/gold_chestplate.png'},
-            {id:'item_gold_leggings',name:'Perneiras de Ouro',path:'textures/items/gold_leggings.png'},
-            {id:'item_gold_boots',name:'Botas de Ouro',path:'textures/items/gold_boots.png'},
-            // Armaduras de Diamante
-            {id:'item_diamond_helmet',name:'Capacete de Diamante',path:'textures/items/diamond_helmet.png'},
-            {id:'item_diamond_chestplate',name:'Peitoral de Diamante',path:'textures/items/diamond_chestplate.png'},
-            {id:'item_diamond_leggings',name:'Perneiras de Diamante',path:'textures/items/diamond_leggings.png'},
-            {id:'item_diamond_boots',name:'Botas de Diamante',path:'textures/items/diamond_boots.png'},
-            // Armaduras de Netherita
-            {id:'item_netherite_helmet',name:'Capacete de Netherita',path:'textures/items/netherite_helmet.png'},
-            {id:'item_netherite_chestplate',name:'Peitoral de Netherita',path:'textures/items/netherite_chestplate.png'},
-            {id:'item_netherite_leggings',name:'Perneiras de Netherita',path:'textures/items/netherite_leggings.png'},
-            {id:'item_netherite_boots',name:'Botas de Netherita',path:'textures/items/netherite_boots.png'},
-
-            // Itens de Combate e Utilidades
-            {id:'item_bow',name:'Arco',path:'textures/items/bow_standby.png'},
-            {id:'item_crossbow',name:'Besta',path:'textures/items/crossbow_standby.png'},
-            {id:'item_arrow',name:'Flecha',path:'textures/items/arrow.png'},
-            {id:'item_shield',name:'Escudo',path:'textures/items/shield.png'},
-            {id:'item_elytra',name:'Élitro',path:'textures/items/elytra.png'},
-            {id:'item_trident',name:'Tridente',path:'textures/items/trident.png'},
-            {id:'item_ender_pearl',name:'Pérola do Fim',path:'textures/items/ender_pearl.png'},
-            {id:'item_ender_eye',name:'Olho do Fim',path:'textures/items/ender_eye.png'},
-            {id:'item_fishing_rod',name:'Vara de Pesca',path:'textures/items/fishing_rod_uncast.png'},
-            {id:'item_bucket_empty',name:'Balde Vazio',path:'textures/items/bucket_empty.png'},
-            {id:'item_bucket_water',name:'Balde de Água',path:'textures/items/bucket_water.png'},
-            {id:'item_bucket_lava',name:'Balde de Lava',path:'textures/items/bucket_lava.png'},
-            {id:'item_totem',name:'Totem da Imortalidade',path:'textures/items/totem.png'},
-            {id:'item_nether_star',name:'Estrela do Nether',path:'textures/items/nether_star.png'},
-            
-            // Poções
-            {id:'item_potion_bottle_empty',name:'Frasco de Vidro',path:'textures/items/potion_bottle_empty.png'},
-            {id:'item_potion_bottle_drinkable',name:'Poção (Líquido)',path:'textures/items/potion_bottle_drinkable.png'},
-        ].map(item => ({...item, default_image_url: `https://raw.githubusercontent.com/bedrock-dot-dev/packs/master/packs/vanilla/${item.path}`}));
-
-        // O resto do script...
-        let userTextures = {}, selectedTextureId = null, packIconFile = null;
-
-        const textureList = document.getElementById('textureList'), searchInput = document.getElementById('searchTexture'),
-              editorPanel = document.getElementById('editorPanel'), editorPlaceholder = editorPanel.querySelector('.placeholder'),
-              editorContent = editorPanel.querySelector('.editor-content'), editingItemName = document.getElementById('editingItemName'),
-              originalTextureImg = document.getElementById('originalTexture'), newTextureImg = document.getElementById('newTexture'),
-              textureUploadInput = document.getElementById('textureUpload'), packIconInput = document.getElementById('packIconInput'),
-              packIconPreview = document.getElementById('packIconPreview'), packIconPlaceholder = document.getElementById('packIconPlaceholder'),
-              textureListHeader = document.getElementById('textureListHeader');
+        // --- TEMPLATES DE TEXTO BRUTO ---
+        const manifestTemplate=`{"format_version":2,"header":{"name":"__PACK_NAME__","description":"§5 §lpowered by Luna. / spiritmcp on tiktok","uuid":"__UUID_1__","version":[0,0,1],"min_engine_version":[1,21,0]},"modules":[{"description":"§5 §lorodo on Top / spiritmcp on tiktok","type":"resources","uuid":"__UUID_2__","version":[0,0,1]}]}`;const totemTemplate=`{"format_version":"1.10.0","minecraft:attachable":{"description":{"identifier":"minecraft:totem_of_undying","materials":{"default":"entity_alphatest","enchanted":"entity_alphatest_glint"},"textures":{__TEXTURE_LIST__"enchanted":"textures/misc/enchanted_item_glint"},"geometry":{"default":"geometry.vm"},"animations":{"wield":"animation.leftblock.first_person_wield"},"scripts":{"animate":["wield"]},"render_controllers":["controller.render.item_animation_totem"]}}}`;const renderControllerTemplate=`{"format_version":"1.10","render_controllers":{"controller.render.item_animation_totem":{"arrays":{"textures":{"array.item_frames":[__FRAME_ARRAY__]}},"geometry":"Geometry.default","materials":[{"*":"variable.is_enchanted ? material.enchanted : material.default"}],"textures":["temp.life_time = query.life_time * __FPS_VALUE__; return array.item_frames[temp.life_time];","texture.enchanted"]}}}`;const animationTemplate=`{"format_version":"1.10.0","animations":{"animation.leftblock.first_person_wield":{"loop":true,"bones":{"leftitem":{"rotation":["c.is_first_person?-15.0:100.0","c.is_first_person?30.0:20.0","c.is_first_person?4.0:80.0"],"position":["c.is_first_person?__POS_X__:-6.2","c.is_first_person?__POS_Y__:7.0","c.is_first_person?__POS_Z__:4.0"],"scale":["c.is_first_person?__SCALE__:5","c.is_first_person?__SCALE__:5","c.is_first_person?__SCALE__:5"]}}}}}`;const geoTemplate=`{"format_version":"1.16.0","minecraft:geometry":[{"description":{"identifier":"geometry.vm","texture_width":32,"texture_height":32,"visible_bounds_width":15,"visible_bounds_height":5,"visible_bounds_offset":[0,0.5,0]},"bones":[{"name":"leftitem","pivot":[0,0,0],"cubes":[{"origin":[2,0,0],"size":[0,2,2],"uv":{"north":{"uv":[11,11],"uv_size":[2,2]},"east":{"uv":[32,32],"uv_size":[-1,-1]},"south":{"uv":[9,11],"uv_size":[2,2]},"west":{"uv":[0,0],"uv_size":[32,32]},"up":{"uv":[20,12],"uv_size":[-2,-12]},"down":{"uv":[22,12],"uv_size":[-2,-12]}}},{"origin":[2.01,0,0],"size":[0,2,2],"uv":{"north":{"uv":[11,11],"uv_size":[2,2]},"east":{"uv":[32,32],"uv_size":[-1,-1]},"south":{"uv":[9,11],"uv_size":[2,2]},"west":{"uv":[0,0],"uv_size":[32,32]},"up":{"uv":[20,12],"uv_size":[-2,-12]},"down":{"uv":[22,12],"uv_size":[-2,-12]}}},{"origin":[2.02,0,0],"size":[0,2,2],"uv":{"north":{"uv":[11,11],"uv_size":[2,2]},"east":{"uv":[32,32],"uv_size":[-1,-1]},"south":{"uv":[9,11],"uv_size":[2,2]},"west":{"uv":[0,0],"uv_size":[32,32]},"up":{"uv":[20,12],"uv_size":[-2,-12]},"down":{"uv":[22,12],"uv_size":[-2,-12]}}},{"origin":[2.03,0,0],"size":[0,2,2],"uv":{"north":{"uv":[11,11],"uv_size":[2,2]},"east":{"uv":[32,32],"uv_size":[-1,-1]},"south":{"uv":[9,11],"uv_size":[2,2]},"west":{"uv":[0,0],"uv_size":[32,32]},"up":{"uv":[20,12],"uv_size":[-2,-12]},"down":{"uv":[22,12],"uv_size":[-2,-12]}}},{"origin":[2.04,0,0],"size":[0,2,2],"uv":{"north":{"uv":[11,11],"uv_size":[2,2]},"east":{"uv":[32,32],"uv_size":[-1,-1]},"south":{"uv":[9,11],"uv_size":[2,2]},"west":{"uv":[0,0],"uv_size":[32,32]},"up":{"uv":[20,12],"uv_size":[-2,-12]},"down":{"uv":[22,12],"uv_size":[-2,-12]}}},{"origin":[2.05,0,0],"size":[0,2,2],"uv":{"north":{"uv":[11,11],"uv_size":[2,2]},"east":{"uv":[32,32],"uv_size":[-1,-1]},"south":{"uv":[9,11],"uv_size":[2,2]},"west":{"uv":[0,0],"uv_size":[32,32]},"up":{"uv":[20,12],"uv_size":[-2,-12]},"down":{"uv":[22,12],"uv_size":[-2,-12]}}},{"origin":[2.06,0,0],"size":[0,2,2],"uv":{"north":{"uv":[11,11],"uv_size":[2,2]},"east":{"uv":[32,32],"uv_size":[-1,-1]},"south":{"uv":[9,11],"uv_size":[2,2]},"west":{"uv":[0,0],"uv_size":[32,32]},"up":{"uv":[20,12],"uv_size":[-2,-12]},"down":{"uv":[22,12],"uv_size":[-2,-12]}}},{"origin":[2.07,0,0],"size":[0,2,2],"uv":{"north":{"uv":[11,11],"uv_size":[2,2]},"east":{"uv":[32,32],"uv_size":[-1,-1]},"south":{"uv":[9,11],"uv_size":[2,2]},"west":{"uv":[0,0],"uv_size":[32,32]},"up":{"uv":[20,12],"uv_size":[-2,-12]},"down":{"uv":[22,12],"uv_size":[-2,-12]}}},{"origin":[2.08,0,0],"size":[0,2,2],"uv":{"north":{"uv":[11,11],"uv_size":[2,2]},"east":{"uv":[32,32],"uv_size":[-1,-1]},"south":{"uv":[9,11],"uv_size":[2,2]},"west":{"uv":[0,0],"uv_size":[32,32]},"up":{"uv":[20,12],"uv_size":[-2,-12]},"down":{"uv":[22,12],"uv_size":[-2,-12]}}},{"origin":[2.09,0,0],"size":[0,2,2],"uv":{"north":{"uv":[11,11],"uv_size":[2,2]},"east":{"uv":[32,32],"uv_size":[-1,-1]},"south":{"uv":[9,11],"uv_size":[2,2]},"west":{"uv":[0,0],"uv_size":[32,32]},"up":{"uv":[20,12],"uv_size":[-2,-12]},"down":{"uv":[22,12],"uv_size":[-2,-12]}}},{"origin":[2.1,0,0],"size":[0,2,2],"uv":{"north":{"uv":[11,11],"uv_size":[2,2]},"east":{"uv":[32,32],"uv_size":[-1,-1]},"south":{"uv":[9,11],"uv_size":[2,2]},"west":{"uv":[0,0],"uv_size":[32,32]},"up":{"uv":[20,12],"uv_size":[-2,-12]},"down":{"uv":[22,12],"uv_size":[-2,-12]}}}]}]}]}`;
         
-        function renderTextureList(filter = '') {
-            const filteredDb = textureDatabase.filter(item => item.name.toLowerCase().includes(filter.toLowerCase()));
-            textureList.innerHTML = '';
-            textureListHeader.textContent = `Itens e Blocos (${filteredDb.length})`;
+        const gifFileInput=document.getElementById("gifFile"),packIconInput=document.getElementById("packIcon"),packNameInput=document.getElementById("packName"),packFpsInput=document.getElementById("packFps"),downloadBtn=document.getElementById("downloadBtn"),statusDiv=document.getElementById("status"),gifPreview=document.getElementById("gifPreview"),iconPreview=document.getElementById("iconPreview"),gifFileName=document.getElementById("gifFileName"),iconFileName=document.getElementById("iconFileName"),flipBtn=document.getElementById("flipBtn"),fpsDecrementBtn=document.getElementById("fps-decrement"),fpsIncrementBtn=document.getElementById("fps-increment"),settingsModal=document.getElementById("settingsModal"),openSettingsBtn=document.getElementById("openSettingsBtn"),closeSettingsBtn=document.getElementById("closeSettingsBtn"),posXSlider=document.getElementById("posX"),posYSlider=document.getElementById("posY"),posZSlider=document.getElementById("posZ"),scaleSlider=document.getElementById("scale"),posXValue=document.getElementById("posXValue"),posYValue=document.getElementById("posYValue"),posZValue=document.getElementById("posZValue"),scaleValue=document.getElementById("scaleValue");
+        const historyBtn = document.getElementById('historyBtn'), historyPanel = document.getElementById('historyPanel'), historyList = document.getElementById('historyList'), noHistoryMessage = document.getElementById('noHistoryMessage'), clearHistoryBtn = document.getElementById('clearHistoryBtn');
+        
+        let extractedFrames=null, isFlipped=false;
+        let currentGifFile = null, currentIconFile = null;
 
-            if (filteredDb.length === 0) {
-                textureList.innerHTML = `<p style="text-align:center; color: var(--text-secondary);">Nenhuma textura encontrada.</p>`;
-                return;
+        const validateInputs = () => { const allFilled = extractedFrames && currentIconFile && packNameInput.value.trim() !== '' && packFpsInput.value.trim() !== ''; downloadBtn.disabled = !allFilled; downloadBtn.textContent = allFilled ? 'Criar e Baixar .mcpack' : 'Preencha todos os campos'; };
+        
+        const handleGifUpload = async (file) => {
+            if (!file) return;
+            currentGifFile = file;
+            gifPreview.src = URL.createObjectURL(file); gifFileName.textContent = file.name; gifFileName.classList.add('selected');
+            statusDiv.textContent = 'Analisando GIF...'; statusDiv.style.color = 'var(--light-purple)';
+            try {
+                const frames = await extractGifFrames(file); extractedFrames = frames; statusDiv.textContent = `GIF carregado (${frames.length} frames)`;
+            } catch (error) { statusDiv.textContent = `Erro ao processar GIF: ${error.message}`; statusDiv.style.color = '#f87171'; extractedFrames = null; }
+            validateInputs();
+        };
+        
+        const handleIconUpload = (file) => {
+            if (!file) return;
+            currentIconFile = file;
+            iconPreview.src = URL.createObjectURL(file);
+            iconFileName.textContent = file.name;
+            iconFileName.classList.add('selected');
+            validateInputs();
+        };
+
+        gifFileInput.addEventListener('change', () => handleGifUpload(gifFileInput.files[0]));
+        packIconInput.addEventListener('change', () => handleIconUpload(packIconInput.files[0]));
+        packNameInput.addEventListener('keyup', validateInputs); packFpsInput.addEventListener('change', validateInputs);
+        flipBtn.addEventListener('click', () => { isFlipped = !isFlipped; flipBtn.classList.toggle('active', isFlipped); gifPreview.classList.toggle('is-flipped', isFlipped); });
+        fpsDecrementBtn.addEventListener('click', () => { packFpsInput.stepDown(); validateInputs(); });
+        fpsIncrementBtn.addEventListener('click', () => { packFpsInput.stepUp(); validateInputs(); });
+        
+        openSettingsBtn.addEventListener('click', () => settingsModal.classList.add('is-open'));
+        closeSettingsBtn.addEventListener('click', () => settingsModal.classList.remove('is-open'));
+        settingsModal.addEventListener('click', (e) => { if (e.target === settingsModal) settingsModal.classList.remove('is-open'); });
+
+        const updateSliderValue = (slider, display) => { display.textContent = parseFloat(slider.value).toFixed(1); };
+        posXSlider.addEventListener('input', () => updateSliderValue(posXSlider, posXValue));
+        posYSlider.addEventListener('input', () => updateSliderValue(posYSlider, posYValue));
+        posZSlider.addEventListener('input', () => updateSliderValue(posZSlider, posZValue));
+        scaleSlider.addEventListener('input', () => updateSliderValue(scaleSlider, scaleValue));
+
+        // --- LÓGICA DO HISTÓRICO ---
+        historyBtn.addEventListener('click', () => historyPanel.classList.toggle('is-visible'));
+        clearHistoryBtn.addEventListener('click', () => {
+            if (confirm('Tem certeza que deseja limpar todo o histórico?')) {
+                localStorage.removeItem('totemHistory');
+                renderHistory();
             }
-            filteredDb.forEach(item => {
-                const isModified = userTextures[item.path] !== undefined, isSelected = item.id === selectedTextureId;
-                const itemEl = document.createElement('div');
-                itemEl.className = `texture-item ${isSelected ? 'selected' : ''} ${isModified ? 'modified' : ''}`;
-                itemEl.dataset.id = item.id;
-                itemEl.innerHTML = `<img src="${item.default_image_url}" loading="lazy"><span>${item.name}</span>`;
-                itemEl.addEventListener('click', () => selectTexture(item.id));
-                textureList.appendChild(itemEl);
-            });
+        });
+        
+        function getHistory() { return JSON.parse(localStorage.getItem('totemHistory') || '[]'); }
+        function saveToHistory(entry) {
+            let history = getHistory();
+            history.unshift(entry); // Adiciona no início
+            if (history.length > 20) history.pop(); // Limita o histórico a 20 itens
+            localStorage.setItem('totemHistory', JSON.stringify(history));
+            renderHistory();
         }
-        function selectTexture(id) {
-            selectedTextureId = id; const item = textureDatabase.find(t => t.id === id); if (!item) return;
-            editorPlaceholder.style.display = 'none'; editorContent.style.display = 'block';
-            editingItemName.textContent = `Editando: ${item.name}`;
-            originalTextureImg.src = item.default_image_url;
-            newTextureImg.src = userTextures[item.path] || item.default_image_url;
-            renderTextureList(searchInput.value);
+        
+        function renderHistory() {
+            const history = getHistory();
+            historyList.innerHTML = '';
+            if (history.length === 0) {
+                historyList.appendChild(noHistoryMessage);
+            } else {
+                history.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'history-item';
+                    li.innerHTML = `<img src="${item.iconDataUrl}" alt="ícone"><span>${item.name}</span>`;
+                    li.addEventListener('click', () => loadFromHistory(index));
+                    historyList.appendChild(li);
+                });
+            }
         }
-        packIconInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file && file.type === "image/png") {
-                packIconFile = file;
+
+        async function loadFromHistory(index) {
+            const history = getHistory();
+            const item = history[index];
+            if (!item) return;
+            
+            packNameInput.value = item.name;
+            packFpsInput.value = item.fps;
+            
+            const gifBlob = dataURLtoBlob(item.gifDataUrl);
+            const iconBlob = dataURLtoBlob(item.iconDataUrl);
+
+            // Simula um upload de arquivo para re-processar tudo
+            await handleGifUpload(new File([gifBlob], "history.gif", {type: "image/gif"}));
+            handleIconUpload(new File([iconBlob], "history.png", {type: "image/png"}));
+
+            historyPanel.classList.remove('is-visible');
+        }
+
+        async function extractGifFrames(gifFile) {
+            return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    packIconPreview.src = e.target.result; packIconPreview.style.display = 'block';
-                    packIconPlaceholder.style.display = 'none';
+                    try {
+                        const gif = new GIF(e.target.result); const framesData = gif.decompressFrames(true); const hdr = gif.hdr;
+                        if (!framesData || framesData.length === 0 || !hdr) reject(new Error("GIF inválido ou corrompido."));
+                        
+                        const fullCanvas = document.createElement('canvas'); fullCanvas.width = hdr.width; fullCanvas.height = hdr.height;
+                        const fullCtx = fullCanvas.getContext('2d');
+                        const processedFrames = [];
+                        
+                        for (const frame of framesData) {
+                            if (frame.disposal === 2) { fullCtx.clearRect(0, 0, hdr.width, hdr.height); }
+                            const frameCanvas = document.createElement('canvas'); frameCanvas.width = frame.dims.width; frameCanvas.height = frame.dims.height;
+                            const frameCtx = frameCanvas.getContext('2d'); const imageData = frameCtx.createImageData(frame.dims.width, frame.dims.height);
+                            imageData.data.set(frame.patch);
+                            frameCtx.putImageData(imageData, 0, 0);
+                            fullCtx.drawImage(frameCanvas, frame.dims.left, frame.dims.top);
+                            processedFrames.push(fullCanvas.toDataURL('image/png'));
+                        }
+                        resolve(processedFrames);
+                    } catch (error) { reject(error); }
                 };
-                reader.readAsDataURL(file);
-            } else { alert("Por favor, selecione um arquivo .png"); }
-        });
-        textureUploadInput.addEventListener('change', (e) => {
-            const file = e.target.files[0]; if (!file || !selectedTextureId) return;
-            const item = textureDatabase.find(t => t.id === selectedTextureId);
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                userTextures[item.path] = e.target.result;
-                newTextureImg.src = e.target.result;
-                renderTextureList(searchInput.value);
-            };
-            reader.readAsDataURL(file);
-        });
-        searchInput.addEventListener('input', () => renderTextureList(searchInput.value));
-        document.getElementById('createPackBtn').addEventListener('click', async () => {
-            const packName = document.getElementById('packName').value || "Meu Pacote de Texturas", packDesc = document.getElementById('packDesc').value || "Criado com Luna Hub", status = document.getElementById('status');
-            if (!packIconFile) { alert("Por favor, adicione um ícone para o pacote."); return; }
-            if (Object.keys(userTextures).length === 0 && !confirm("Nenhuma textura foi modificada. Deseja criar um pacote vazio?")) return;
-            
-            status.textContent = "Gerando manifest.json...";
-            const zip = new JSZip(), manifest = { format_version: 2, header: { name: packName, description: packDesc, uuid: crypto.randomUUID(), version: [1, 0, 0], min_engine_version: [1, 16, 0] }, modules: [{ type: "resources", uuid: crypto.randomUUID(), version: [1, 0, 0] }] };
-            zip.file("manifest.json", JSON.stringify(manifest, null, 2));
-            zip.file("pack_icon.png", packIconFile);
+                reader.onerror = reject; reader.readAsArrayBuffer(gifFile);
+            });
+        }
+        
+        async function flipFrames(framesToFlip) {
+            const flipPromises = framesToFlip.map(frameDataUrl => new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas'); canvas.width = img.width; canvas.height = img.height;
+                    const ctx = canvas.getContext('2d'); ctx.translate(img.width, 0); ctx.scale(-1, 1); ctx.drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL('image/png'));
+                };
+                img.onerror = reject; img.src = frameDataUrl;
+            }));
+            return Promise.all(flipPromises);
+        }
 
-            status.textContent = "Adicionando texturas customizadas...";
-            const dataURLtoBlob = (dataurl) => { const arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1], bstr = atob(arr[1]); let n = bstr.length; const u8arr = new Uint8Array(n); while(n--) u8arr[n] = bstr.charCodeAt(n); return new Blob([u8arr], {type:mime}); }
-            for (const path in userTextures) zip.file(path, dataURLtoBlob(userTextures[path]));
-            
-            status.textContent = "Compactando... Isso pode levar um momento.";
-            const content = await zip.generateAsync({type:"blob"}), link = document.createElement('a');
-            link.href = URL.createObjectURL(content); link.download = `${packName.replace(/[^a-z0-9]/gi, '_')}.mcpack`;
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
-            status.textContent = `Pacote "${link.download}" criado com sucesso!`;
+        function fileToDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+        function dataURLtoBlob(dataurl) { const [header, base64] = dataurl.split(','); const mime = header.match(/:(.*?);/)[1]; const bstr = atob(base64); let n = bstr.length; const u8arr = new Uint8Array(n); while (n--) { u8arr[n] = bstr.charCodeAt(n); } return new Blob([u8arr], { type: mime }); }
+        
+        downloadBtn.addEventListener('click', async () => {
+            statusDiv.textContent = 'Iniciando...'; statusDiv.style.color = 'var(--light-purple)'; downloadBtn.disabled = true;
+            try {
+                // Salvar no histórico ANTES de processar
+                const historyEntry = {
+                    name: packNameInput.value,
+                    fps: packFpsInput.value,
+                    gifDataUrl: await fileToDataURL(currentGifFile),
+                    iconDataUrl: await fileToDataURL(currentIconFile)
+                };
+                saveToHistory(historyEntry);
+                
+                let framesToProcess = extractedFrames;
+                if (isFlipped) { statusDiv.textContent = 'Invertendo frames...'; framesToProcess = await flipFrames(extractedFrames); }
+
+                statusDiv.textContent = 'Gerando arquivos...';
+                const frameCount = framesToProcess.length;
+                const packNameSanitized = packNameInput.value.trim().replace(/[^a-zA-Z0-9_]/g, '_');
+                const fps = parseFloat(packFpsInput.value) || 20.0;
+                
+                let textureList = ''; let frameArray = '';
+                for (let i = 1; i <= frameCount; i++) {
+                    textureList += `"item_frame_${i}":"textures/item/item${i}",`;
+                    frameArray += `"texture.item_frame_${i}"${i === frameCount ? '' : ','}`;
+                }
+                
+                const manifestContent = manifestTemplate.trim().replace('__PACK_NAME__', `${packNameInput.value.trim()} by §5Luna`).replace('__UUID_1__', crypto.randomUUID()).replace('__UUID_2__', crypto.randomUUID());
+                const totemContent = totemTemplate.trim().replace('__TEXTURE_LIST__', textureList);
+                const renderControllerContent = renderControllerTemplate.trim().replace('__FRAME_ARRAY__', frameArray).replace('__FPS_VALUE__', `${fps.toFixed(1)}`);
+                const animationContent = animationTemplate.trim()
+                    .replace('__POS_X__', parseFloat(posXSlider.value).toFixed(1))
+                    .replace('__POS_Y__', parseFloat(posYSlider.value).toFixed(1))
+                    .replace('__POS_Z__', parseFloat(posZSlider.value).toFixed(1))
+                    .replace(/__SCALE__/g, parseFloat(scaleSlider.value).toFixed(1));
+
+                statusDiv.textContent = 'Compactando o pacote...';
+                const zip = new JSZip();
+                const watermark = "powered by Luna.";
+
+                zip.file('animations/vleftblock.animation.json', animationContent); zip.file('animations/' + watermark, '');
+                zip.file('attachables/totem.json', totemContent); zip.file('attachables/' + watermark, '');
+                zip.file('models/entity/vm.geo.json', geoTemplate); zip.file('models/entity/' + watermark, '');
+                zip.file('render_controllers/item_animation.render_controllers.json', renderControllerContent); zip.file('render_controllers/' + watermark, '');
+                
+                const itemFolder = zip.folder('textures/item'); itemFolder.file(watermark, '');
+                for (let i = 0; i < frameCount; i++) { itemFolder.file(`item${i + 1}.png`, dataURLtoBlob(framesToProcess[i]), { base64: true }); }
+
+                zip.file('textures/items/totem.png', dataURLtoBlob(framesToProcess[0]), { base64: true }); zip.file('textures/items/' + watermark, '');
+                zip.file('manifest.json', manifestContent); zip.file('pack_icon.png', currentIconFile);
+
+                statusDiv.textContent = 'Finalizando...';
+                const content = await zip.generateAsync({ type: 'blob' });
+                const link = document.createElement('a'); link.href = URL.createObjectURL(content); link.download = `${packNameSanitized || 'totem_animado'}.mcpack`;
+                document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                
+                statusDiv.textContent = `Pacote '${link.download}' criado com sucesso!`;
+                statusDiv.style.color = '#4ade80';
+
+            } catch (error) {
+                console.error(error);
+                statusDiv.textContent = `Erro: ${error.message}`;
+                statusDiv.style.color = '#f87171';
+            } finally {
+                 validateInputs();
+            }
         });
+        
         const pageTransition = document.getElementById('pageTransition');
-        window.addEventListener('load', () => pageTransition.classList.add('animate-in'));
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', e => { e.preventDefault(); const dest = link.href; pageTransition.classList.add('animate-out'); setTimeout(() => window.location.href = dest, 500); });
+        window.addEventListener('load', () => { 
+            pageTransition.classList.add('animate-in');
+            renderHistory(); // Carrega o histórico ao iniciar a página
         });
-        renderTextureList();
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault(); const destination = link.href;
+                pageTransition.classList.add('animate-out');
+                setTimeout(() => { window.location.href = destination; }, 500);
+            });
+        });
     </script>
 </body>
 </html>
