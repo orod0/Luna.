@@ -11,7 +11,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display-swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -153,15 +153,16 @@
         .social-icon { display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 50%; color: var(--text-secondary); font-size: 1.5rem; text-decoration: none; transition: all 0.4s ease; backdrop-filter: blur(10px); }
         .social-icon:hover { color: var(--text-primary); background-color: var(--deep-purple); transform: translateY(-5px); box-shadow: 0 0 20px var(--glow-color); border-color: var(--light-purple); }
         
-        /* --- ESTILOS DO PAINEL DE HISTÓRICO --- */
-        #historyPanel {
+        #historyPanel, #fpsPreviewContainer {
             position: absolute; top: 0; left: calc(100% + 20px); width: 300px;
             background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px;
             padding: 20px; z-index: 100; opacity: 0; pointer-events: none;
             transition: opacity 0.3s ease, transform 0.3s ease; transform: translateX(20px);
-            max-height: 80vh; display: flex; flex-direction: column;
+            display: flex; flex-direction: column;
         }
-        #historyPanel.is-visible { opacity: 1; transform: translateX(0); pointer-events: auto; }
+        #historyPanel { max-height: 80vh; }
+        #historyPanel.is-visible, #fpsPreviewContainer.is-visible { opacity: 1; transform: translateX(0); pointer-events: auto; }
+        
         .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .history-header h3 { font-size: 1.2rem; }
         #clearHistoryBtn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.8rem; text-decoration: underline; }
@@ -171,12 +172,17 @@
         .history-item img { width: 40px; height: 40px; border-radius: 6px; object-fit: contain; flex-shrink: 0; }
         .history-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         #noHistoryMessage { text-align: center; color: var(--text-secondary); padding: 20px 0; }
+        
+        #closePreviewBtn { position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer; transition: color 0.2s; }
+        #closePreviewBtn:hover { color: var(--text-primary); }
+        #gifCanvas { width: 100%; border-radius: 8px; background-color: var(--input-bg); }
 
         @media (max-width: 1000px) {
-             #historyPanel {
-                position: static; transform: none; width: auto; margin-top: 20px; max-height: 300px;
+             #historyPanel, #fpsPreviewContainer {
+                position: static; transform: none; width: auto; margin-top: 20px;
              }
-             #historyPanel.is-visible { transform: none; }
+             #historyPanel { max-height: 300px; }
+             #historyPanel.is-visible, #fpsPreviewContainer.is-visible { transform: none; }
         }
         @media (max-width: 480px) { .back-to-hub { padding: 10px 15px; font-size: 0.9rem; bottom: 15px; left: 15px; } .social-links { bottom: 15px; right: 15px; gap: 12px; } .social-icon { width: 45px; height: 45px; font-size: 1.3rem; } }
     </style>
@@ -209,7 +215,10 @@
             </div>
             <div class="input-group"><label for="packName">3. Dê um nome ao Pacote</label><input type="text" id="packName" placeholder="Ex: MeuTotemRoxo"></div>
             <div class="input-group">
-                <label for="packFps">4. Defina o FPS (Velocidade)</label>
+                <div class="label-wrapper">
+                    <label for="packFps">4. Defina o FPS (Velocidade)</label>
+                    <button class="settings-btn" id="previewFpsBtn" title="Pré-visualizar GIF com FPS aplicado"><i class="fas fa-eye"></i></button>
+                </div>
                 <div class="number-input-wrapper">
                     <button class="num-btn" id="fps-decrement">-</button><input type="number" id="packFps" value="20" min="1" max="120"><button class="num-btn" id="fps-increment">+</button>
                 </div>
@@ -218,15 +227,14 @@
             <div id="status"></div>
         </div>
 
-        <!-- PAINEL DE HISTÓRICO -->
         <div id="historyPanel">
-            <div class="history-header">
-                <h3>Histórico</h3>
-                <button id="clearHistoryBtn">Limpar</button>
-            </div>
-            <ul id="historyList">
-                <li id="noHistoryMessage">Nenhum totem salvo ainda.</li>
-            </ul>
+            <div class="history-header"><h3>Histórico</h3><button id="clearHistoryBtn">Limpar</button></div>
+            <ul id="historyList"><li id="noHistoryMessage">Nenhum totem salvo ainda.</li></ul>
+        </div>
+        
+        <div id="fpsPreviewContainer">
+            <button id="closePreviewBtn">&times;</button>
+            <canvas id="gifCanvas"></canvas>
         </div>
     </div>
 
@@ -239,9 +247,10 @@
         
         const gifFileInput=document.getElementById("gifFile"),packIconInput=document.getElementById("packIcon"),packNameInput=document.getElementById("packName"),packFpsInput=document.getElementById("packFps"),downloadBtn=document.getElementById("downloadBtn"),statusDiv=document.getElementById("status"),gifPreview=document.getElementById("gifPreview"),iconPreview=document.getElementById("iconPreview"),gifFileName=document.getElementById("gifFileName"),iconFileName=document.getElementById("iconFileName"),flipBtn=document.getElementById("flipBtn"),fpsDecrementBtn=document.getElementById("fps-decrement"),fpsIncrementBtn=document.getElementById("fps-increment"),settingsModal=document.getElementById("settingsModal"),openSettingsBtn=document.getElementById("openSettingsBtn"),closeSettingsBtn=document.getElementById("closeSettingsBtn"),posXSlider=document.getElementById("posX"),posYSlider=document.getElementById("posY"),posZSlider=document.getElementById("posZ"),scaleSlider=document.getElementById("scale"),posXValue=document.getElementById("posXValue"),posYValue=document.getElementById("posYValue"),posZValue=document.getElementById("posZValue"),scaleValue=document.getElementById("scaleValue");
         const historyBtn = document.getElementById('historyBtn'), historyPanel = document.getElementById('historyPanel'), historyList = document.getElementById('historyList'), noHistoryMessage = document.getElementById('noHistoryMessage'), clearHistoryBtn = document.getElementById('clearHistoryBtn');
+        const previewFpsBtn = document.getElementById('previewFpsBtn'), fpsPreviewContainer = document.getElementById('fpsPreviewContainer'), closePreviewBtn = document.getElementById('closePreviewBtn'), gifCanvas = document.getElementById('gifCanvas');
         
-        let extractedFrames=null, isFlipped=false;
-        let currentGifFile = null, currentIconFile = null;
+        let extractedFrames=null, isFlipped=false, currentGifFile = null, currentIconFile = null;
+        let previewAnimationId=null, isPreviewing=false;
 
         const validateInputs = () => { const allFilled = extractedFrames && currentIconFile && packNameInput.value.trim() !== '' && packFpsInput.value.trim() !== ''; downloadBtn.disabled = !allFilled; downloadBtn.textContent = allFilled ? 'Criar e Baixar .mcpack' : 'Preencha todos os campos'; };
         
@@ -282,8 +291,10 @@
         posZSlider.addEventListener('input', () => updateSliderValue(posZSlider, posZValue));
         scaleSlider.addEventListener('input', () => updateSliderValue(scaleSlider, scaleValue));
 
-        // --- LÓGICA DO HISTÓRICO ---
-        historyBtn.addEventListener('click', () => historyPanel.classList.toggle('is-visible'));
+        historyBtn.addEventListener('click', () => {
+            fpsPreviewContainer.classList.remove('is-visible'); // Garante que o preview feche
+            historyPanel.classList.toggle('is-visible');
+        });
         clearHistoryBtn.addEventListener('click', () => {
             if (confirm('Tem certeza que deseja limpar todo o histórico?')) {
                 localStorage.removeItem('totemHistory');
@@ -294,8 +305,8 @@
         function getHistory() { return JSON.parse(localStorage.getItem('totemHistory') || '[]'); }
         function saveToHistory(entry) {
             let history = getHistory();
-            history.unshift(entry); // Adiciona no início
-            if (history.length > 20) history.pop(); // Limita o histórico a 20 itens
+            history.unshift(entry);
+            if (history.length > 20) history.pop();
             localStorage.setItem('totemHistory', JSON.stringify(history));
             renderHistory();
         }
@@ -327,12 +338,45 @@
             const gifBlob = dataURLtoBlob(item.gifDataUrl);
             const iconBlob = dataURLtoBlob(item.iconDataUrl);
 
-            // Simula um upload de arquivo para re-processar tudo
             await handleGifUpload(new File([gifBlob], "history.gif", {type: "image/gif"}));
             handleIconUpload(new File([iconBlob], "history.png", {type: "image/png"}));
 
             historyPanel.classList.remove('is-visible');
         }
+
+        function startPreview() {
+            if (!extractedFrames || extractedFrames.length === 0) { alert("Por favor, carregue um GIF primeiro."); return; }
+            historyPanel.classList.remove('is-visible'); // Garante que o histórico feche
+            isPreviewing = true;
+            fpsPreviewContainer.classList.add('is-visible');
+            const ctx = gifCanvas.getContext('2d');
+            const frameImages = extractedFrames.map(src => { const img = new Image(); img.src = src; return img; });
+            let frameIndex = 0, lastTime = 0;
+            
+            function animatePreview(timestamp) {
+                if (!isPreviewing) return;
+                const fps = parseFloat(packFpsInput.value) || 20, interval = 1000 / fps, deltaTime = timestamp - lastTime;
+                if (deltaTime > interval) {
+                    lastTime = timestamp - (deltaTime % interval);
+                    const img = frameImages[frameIndex];
+                    if (gifCanvas.width !== img.width || gifCanvas.height !== img.height) { gifCanvas.width = img.width; gifCanvas.height = img.height; }
+                    ctx.clearRect(0, 0, gifCanvas.width, gifCanvas.height); ctx.drawImage(img, 0, 0);
+                    frameIndex = (frameIndex + 1) % frameImages.length;
+                }
+                previewAnimationId = requestAnimationFrame(animatePreview);
+            }
+            cancelAnimationFrame(previewAnimationId);
+            animatePreview(0);
+        }
+
+        function stopPreview() {
+            isPreviewing = false;
+            fpsPreviewContainer.classList.remove('is-visible');
+            if (previewAnimationId) { cancelAnimationFrame(previewAnimationId); previewAnimationId = null; }
+        }
+        
+        previewFpsBtn.addEventListener('click', startPreview);
+        closePreviewBtn.addEventListener('click', stopPreview);
 
         async function extractGifFrames(gifFile) {
             return new Promise((resolve, reject) => {
@@ -375,20 +419,12 @@
             return Promise.all(flipPromises);
         }
 
-        function fileToDataURL(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
+        function fileToDataURL(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(file); }); }
         function dataURLtoBlob(dataurl) { const [header, base64] = dataurl.split(','); const mime = header.match(/:(.*?);/)[1]; const bstr = atob(base64); let n = bstr.length; const u8arr = new Uint8Array(n); while (n--) { u8arr[n] = bstr.charCodeAt(n); } return new Blob([u8arr], { type: mime }); }
         
         downloadBtn.addEventListener('click', async () => {
             statusDiv.textContent = 'Iniciando...'; statusDiv.style.color = 'var(--light-purple)'; downloadBtn.disabled = true;
             try {
-                // Salvar no histórico ANTES de processar
                 const historyEntry = {
                     name: packNameInput.value,
                     fps: packFpsInput.value,
@@ -455,7 +491,7 @@
         const pageTransition = document.getElementById('pageTransition');
         window.addEventListener('load', () => { 
             pageTransition.classList.add('animate-in');
-            renderHistory(); // Carrega o histórico ao iniciar a página
+            renderHistory();
         });
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', (e) => {
