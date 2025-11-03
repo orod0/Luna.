@@ -6,7 +6,7 @@
     <title>Luna Hub - Totem Creator</title>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/js-md5/build/md5.min.js"></script> 
     <script src="gif.js"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -67,7 +67,8 @@
         .num-btn { background: rgba(255,255,255,0.05); color: var(--text-secondary); border: none; padding: 0 20px; font-size: 1.5rem; font-weight: 600; cursor: pointer; align-self: stretch; transition: background-color 0.3s, color 0.3s; touch-action: manipulation; min-height: 60px; }
         .num-btn:hover { background: var(--deep-purple); color: white; }
         .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10,10,16,.5);backdrop-filter:blur(8px);z-index:2000;display:flex;justify-content:center;align-items:center;padding:20px;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility .3s ease}.modal-overlay.is-open{opacity:1;visibility:visible}.modal-content{position:relative;width:100%;max-width:500px;background:var(--card-bg);border:1px solid var(--border-color);border-radius:16px;padding:30px;transform:scale(.95);transition:transform .3s ease}.modal-overlay.is-open .modal-content{transform:scale(1)}.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.modal-header h2{font-size:1.5rem}.close-modal-btn{background:0 0;border:none;color:var(--text-secondary);font-size:1.8rem;cursor:pointer;transition:color .3s;padding:5px;line-height:1}.close-modal-btn:hover{color:var(--text-primary)}.position-settings{display:grid;grid-template-columns:1fr;gap:15px}.slider-group{display:flex;align-items:center;gap:15px}.slider-group label{flex-basis:30px;font-weight:700;color:var(--text-primary)}.slider-group input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:8px;background:var(--input-bg);border-radius:5px;outline:0;transition:background .3s}.slider-group input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;background:var(--light-purple);cursor:pointer;border-radius:50%;border:3px solid var(--dark-space)}.slider-group input[type=range]::-moz-range-thumb{width:20px;height:20px;background:var(--light-purple);cursor:pointer;border-radius:50%;border:3px solid var(--dark-space)}.slider-value{font-weight:600;color:var(--text-secondary);min-width:45px;text-align:right}
-        #fpsPreviewContainer{position:absolute;top:50%;left:calc(100% + 20px);transform:translateY(-50%) translateX(20px);width:300px;background:var(--card-bg);border:1px solid var(--border-color);border-radius:16px;padding:20px;z-index:100;opacity:0;pointer-events:none;transition:opacity .3s ease,transform .3s ease;display:flex;flex-direction:column}#fpsPreviewContainer.is-visible{opacity:1;transform:translateY(-50%) translateX(0);pointer-events:auto}
+        #fpsPreviewContainer { position: absolute; top: 0; left: calc(100% + 20px); width: 300px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; transform: translateX(20px); display: flex; flex-direction: column; }
+        #fpsPreviewContainer.is-visible { opacity: 1; transform: translateX(0); pointer-events: auto; }
         #historyPanel { position: absolute; top: 0; right: calc(100% + 20px); width: 300px; max-height: 80vh; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; z-index: 100; display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; transform: translateX(-20px); }
         #historyPanel.is-visible{opacity:1;transform:translateX(0);pointer-events:auto}
         .history-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.history-header h3{font-size:1.2rem}#clearHistoryBtn{background:0 0;border:none;color:var(--text-secondary);cursor:pointer;font-size:.8rem;text-decoration:underline}#historyList{list-style:none;overflow-y:auto;flex-grow:1}.history-item{display:flex;align-items:center;gap:15px;padding:10px;border-radius:8px;cursor:pointer;transition:background-color .2s}.history-item:hover{background-color:var(--input-bg)}.history-item img{width:40px;height:40px;border-radius:6px;object-fit:contain;flex-shrink:0}.history-item span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#noHistoryMessage{text-align:center;color:var(--text-secondary);padding:20px 0}
@@ -79,13 +80,12 @@
 <body>
     <div class="page-transition" id="pageTransition"></div>
     <a href="index.html" class="back-to-hub nav-link"><i class="fas fa-arrow-left"></i> Voltar ao Hub</a>
-
     <div class="main-wrapper">
         <div class="creator-card">
             <div class="card-header"><h1>Luna <span>Totem Creator</span></h1><p>A forma definitiva para criar totens animados em segundos.</p></div>
             <div class="input-group">
                 <div class="label-wrapper"><label>1. Escolha seu GIF Animado</label><div class="actions"><button class="settings-btn" id="historyBtn" title="Histórico"><i class="fas fa-history"></i></button><button class="settings-btn" id="flipBtn" title="Inverter GIF"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="margin-left: -10px; margin-right: 2px;"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></button><button class="settings-btn" id="openSettingsBtn" title="Configurações de Posição"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.438.995s.145.755.438.995l1.003.827c.424.35.534.954.26 1.431l-1.296 2.247a1.125 1.125 0 01-1.37.49l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.063-.374-.313-.686-.645-.87a6.52 6.52 0 01-.22-.127c-.324-.196-.72-.257-1.075-.124l-1.217.456a1.125 1.125 0 01-1.37-.49l-1.296-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.437-.995s-.145-.755-.437-.995l-1.004-.827a1.125 1.125 0 01-.26-1.431l1.296-2.247a1.125 1.125 0 011.37-.49l1.217.456c.355.133.75.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg></button></div></div>
-                <div class="file-input-wrapper"><input type="file" id="gifFile" accept=".gif"><img id="gifPreview" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="GIF Preview"><span id="gifFileName" class="file-input-text">Clique para selecionar um arquivo...</span></div>
+                <div class="file-input-wrapper"><input type="file" id="gifFile" accept=".gif"><img id="gifPreview" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="GIF Preview"><span id="gifFileName" class="file-input-text">Clique para selecionar...</span></div>
             </div>
             <div class="input-group"><label>2. Ícone do Pacote (PNG)</label><div class="file-input-wrapper"><input type="file" id="packIcon" accept=".png"><img id="iconPreview" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Icon Preview"><span id="iconFileName" class="file-input-text">Clique para selecionar...</span></div></div>
             <div class="input-group"><label for="packName">3. Nome do Pacote</label><input type="text" id="packName" placeholder="Ex: MeuTotemRoxo"></div>
@@ -96,165 +96,64 @@
             <button id="downloadBtn" class="download-btn" disabled>Preencha todos os campos</button>
             <div id="status"></div>
         </div>
-
         <div id="historyPanel"><div class="history-header"><h3>Histórico</h3><button id="clearHistoryBtn">Limpar</button></div><ul id="historyList"><li id="noHistoryMessage">Nenhum totem salvo.</li></ul></div>
         <div id="fpsPreviewContainer"><button id="closePreviewBtn">&times;</button><canvas id="gifCanvas"></canvas></div>
     </div>
-
     <div class="modal-overlay" id="settingsModal"><div class="modal-content"><div class="modal-header"><h2>Posição do Totem</h2><button class="close-modal-btn" id="closeSettingsBtn">&times;</button></div><div class="position-settings"><div class="slider-group"><label for="posX">X</label><input type="range" id="posX" min="-40" max="0" value="-23" step="0.1"><span class="slider-value" id="posXValue">-23.0</span></div><div class="slider-group"><label for="posY">Y</label><input type="range" id="posY" min="-10" max="20" value="6.8" step="0.1"><span class="slider-value" id="posYValue">6.8</span></div><div class="slider-group"><label for="posZ">Z</label><input type="range" id="posZ" min="0" max="20" value="11" step="0.1"><span class="slider-value" id="posZValue">11.0</span></div><div class="slider-group"><label for="scale">Escala</label><input type="range" id="scale" min="1" max="8" value="3.2" step="0.1"><span class="slider-value" id="scaleValue">3.2</span></div></div></div></div>
     <div class="social-links"><a href="https://www.tiktok.com/@spiritmcp" target="_blank" rel="noopener noreferrer" class="social-icon" title="TikTok"><i class="fab fa-tiktok"></i></a><a href="#" class="social-icon" title="Discord"><i class="fab fa-discord"></i></a></div>
 
     <script>
-        const manifestTemplate=`{"format_version":2,"header":{"name":"__PACK_NAME__","description":"§5 §lpowered by Luna. / spiritmcp on tiktok","uuid":"__UUID_1__","version":[0,0,1],"min_engine_version":[1,21,0]},"modules":[{"description":"§5 §lorodo on Top / spiritmcp on tiktok","type":"resources","uuid":"__UUID_2__","version":[0,0,1]}]}`;const totemTemplate=`{"format_version":"1.10.0","minecraft:attachable":{"description":{"identifier":"minecraft:totem_of_undying","materials":{"default":"entity_alphatest","enchanted":"entity_alphatest_glint"},"textures":{__TEXTURE_LIST__"enchanted":"textures/misc/enchanted_item_glint"},"geometry":{"default":"geometry.vm"},"animations":{"wield":"animation.leftblock.first_person_wield"},"scripts":{"animate":["wield"]},"render_controllers":["controller.render.item_animation_totem"]}}}`;const renderControllerTemplate=`{"format_version":"1.10","render_controllers":{"controller.render.item_animation_totem":{"arrays":{"textures":{"array.item_frames":[__FRAME_ARRAY__]}},"geometry":"Geometry.default","materials":[{"*":"variable.is_enchanted ? material.enchanted : material.default"}],"textures":["temp.life_time = query.life_time * __FPS_VALUE__; return array.item_frames[temp.life_time];","texture.enchanted"]}}}`;const animationTemplate=`{"format_version":"1.10.0","animations":{"animation.leftblock.first_person_wield":{"loop":true,"bones":{"leftitem":{"rotation":["c.is_first_person?-15.0:100.0","c.is_first_person?30.0:20.0","c.is_first_person?4.0:80.0"],"position":["c.is_first_person?__POS_X__:-6.2","c.is_first_person?__POS_Y__:7.0","c.is_first_person?__POS_Z__:4.0"],"scale":["c.is_first_person?__SCALE__:5","c.is_first_person?__SCALE__:5","c.is_first_person?__SCALE__:5"]}}}}}`;const geoTemplate=`{"format_version":"1.16.0","minecraft:geometry":[{"description":{"identifier":"geometry.vm","texture_width":32,"texture_height":32,"visible_bounds_width":15,"visible_bounds_height":5,"visible_bounds_offset":[0,0.5,0]},"bones":[{"name":"leftitem","pivot":[0,0,0],"cubes":[]}]}]}`;
-        
+        const manifestTemplate=`{"format_version":2,"header":{"name":"__PACK_NAME__","description":"§5 §lpowered by Luna. / spiritmcp on tiktok","uuid":"__UUID_1__","version":[0,0,1],"min_engine_version":[1,21,0]},"modules":[{"description":"§5 §lorodo on Top / spiritmcp on tiktok","type":"resources","uuid":"__UUID_2__","version":[0,0,1]}]}`;const totemTemplate=`{"format_version":"1.10.0","minecraft:attachable":{"description":{"identifier":"minecraft:totem_of_undying","materials":{"default":"entity_alphatest","enchanted":"entity_alphatest_glint"},"textures":{__TEXTURE_LIST__"enchanted":"textures/misc/enchanted_item_glint"},"geometry":{"default":"geometry.vm"},"animations":{"wield":"animation.leftblock.first_person_wield"},"scripts":{"animate":["wield"]},"render_controllers":["controller.render.item_animation_totem"]}}}`;const renderControllerTemplate=`{"format_version":"1.10","render_controllers":{"controller.render.item_animation_totem":{"arrays":{"textures":{"array.item_frames":[__FRAME_ARRAY__]}},"geometry":"Geometry.default","materials":[{"*":"variable.is_enchanted ? material.enchanted : material.default"}],"textures":["temp.life_time = query.life_time * __FPS_VALUE__; return array.item_frames[temp.life_time];","texture.enchanted"]}}}`;const animationTemplate=`{"format_version":"1.10.0","animations":{"animation.leftblock.first_person_wield":{"loop":true,"bones":{"leftitem":{"rotation":["c.is_first_person?-15.0:100.0","c.is_first_person?30.0:20.0","c.is_first_person?4.0:80.0"],"position":["c.is_first_person?__POS_X__:-6.2","c.is_first_person?__POS_Y__:7.0","c.is_first_person?__POS_Z__:4.0"],"scale":["c.is_first_person?__SCALE__:5","c.is_first_person?__SCALE__:5","c.is_first_person?__SCALE__:5"]}}}}}`;
+
+        const geoTemplate = `{"format_version":"1.16.0","minecraft:geometry":[{"description":{"identifier":"geometry.vm","texture_width":32,"texture_height":32,"visible_bounds_width":15,"visible_bounds_height":5,"visible_bounds_offset":[0,0.5,0]},"bones":[{"name":"leftitem","pivot":[0,0,0],"cubes":[{"origin":[2,0,0],"size":[0,2,2],"uv":{"north":{"uv":[11,11],"uv_size":[2,2]},"east":{"uv":[32,32],"uv_size":[-1,-1]},"south":{"uv":[9,11],"uv_size":[2,2]},"west":{"uv":[0,0],"uv_size":[32,32]},"up":{"uv":[20,12],"uv_size":[-2,-12]},"down":{"uv":[22,12],"uv_size":[-2,-12]}}},{"origin":[2.01,0,0],"size":[0,2,2],"uv":{"north":{"uv":[11,11],"uv_size":[2,2]},"east":{"uv":[32,32],"uv_size":[-1,-1]},"south":{"uv":[9,11],"uv_size":[2,2]},"west":{"uv":[0,0],"uv_size":[32,32]},"up":{"uv":[20,12],"uv_size":[-2,-12]},"down":{"uv":[22,12],"uv_size":[-2,-12]}}},{"origin":[2.02,0,0],"size":[0,2,2],"uv":{"north":{"uv":[11,11],"uv_size":[2,2]},"east":{"uv":[32,32],"uv_size":[-1,-1]},"south":{"uv":[9,11],"uv_size":[2,2]},"west":{"uv":[0,0],"uv_size":[32,32]},"up":{"uv":[20,12],"uv_size":[-2,-12]},"down":{"uv":[22,12],"uv_size":[-2,-12]}}},{"origin":[2.03,0,0],"size":[0,2,2],"uv":{"north":{"uv":[11,11],"uv_size":[2,2]},"east":{"uv":[32,32],"uv_size":[-1,-1]},"south":{"uv":[9,11],"uv_size":[2,2]},"west":{"uv":[0,0],"uv_size":[32,32]},"up":{"uv":[20,12],"uv_size":[-2,-12]},"down":{"uv":[22,12],"uv_size":[-2,-12]}}},{"origin":[2.04,0,0],"size":[0,2,2],"uv":{"north":{"uv":[11,11],"uv_size":[2,2]},"east":{"uv":[32,32],"uv_size":[-1,-1]},"south":{"uv":[9,11],"uv_size":[2,2]},"west":{"uv":[0,0],"uv_size":[32,32]},"up":{"uv":[20,12],"uv_size":[-2,-12]},"down":{"uv":[22,12],"uv_size":[-2,-12]}}},{"origin":[2.05,0,0],"size":[0,2,2],"uv":{"north":{"uv":[11,11],"uv_size":[2,2]},"east":{"uv":[32,32],"uv_size":[-1,-1]},"south":{"uv":[9,11],"uv_size":[2,2]},"west":{"uv":[0,0],"uv_size":[32,32]},"up":{"uv":[20,12],"uv_size":[-2,-12]},"down":{"uv":[22,12],"uv_size":[-2,-12]}}},{"origin":[2.06,0,0],"size":[0,2,2],"uv":{"north":{"uv":[11,11],"uv_size":[2,2]},"east":{"uv":[32,32],"uv_size":[-1,-1]},"south":{"uv":[9,11],"uv_size":[2,2]},"west":{"uv":[0,0],"uv_size":[32,32]},"up":{"uv":[20,12],"uv_size":[-2,-12]},"down":{"uv":[22,12],"uv_size":[-2,-12]}}},{"origin":[2.07,0,0],"size":[0,2,2],"uv":{"north":{"uv":[11,11],"uv_size":[2,2]},"east":{"uv":[32,32],"uv_size":[-1,-1]},"south":{"uv":[9,11],"uv_size":[2,2]},"west":{"uv":[0,0],"uv_size":[32,32]},"up":{"uv":[20,12],"uv_size":[-2,-12]},"down":{"uv":[22,12],"uv_size":[-2,-12]}}},{"origin":[2.08,0,0],"size":[0,2,2],"uv":{"north":{"uv":[11,11],"uv_size":[2,2]},"east":{"uv":[32,32],"uv_size":[-1,-1]},"south":{"uv":[9,11],"uv_size":[2,2]},"west":{"uv":[0,0],"uv_size":[32,32]},"up":{"uv":[20,12],"uv_size":[-2,-12]},"down":{"uv":[22,12],"uv_size":[-2,-12]}}},{"origin":[2.09,0,0],"size":[0,2,2],"uv":{"north":{"uv":[11,11],"uv_size":[2,2]},"east":{"uv":[32,32],"uv_size":[-1,-1]},"south":{"uv":[9,11],"uv_size":[2,2]},"west":{"uv":[0,0],"uv_size":[32,32]},"up":{"uv":[20,12],"uv_size":[-2,-12]},"down":{"uv":[22,12],"uv_size":[-2,-12]}}},{"origin":[2.1,0,0],"size":[0,2,2],"uv":{"north":{"uv":[11,11],"uv_size":[2,2]},"east":{"uv":[32,32],"uv_size":[-1,-1]},"south":{"uv":[9,11],"uv_size":[2,2]},"west":{"uv":[0,0],"uv_size":[32,32]},"up":{"uv":[20,12],"uv_size":[-2,-12]},"down":{"uv":[22,12],"uv_size":[-2,-12]}}}]}]}]}`;
+
         // --- ELEMENTOS DO DOM ---
-        const gifFileInput=document.getElementById("gifFile"),packIconInput=document.getElementById("packIcon"),packNameInput=document.getElementById("packName"),packFpsInput=document.getElementById("packFps"),downloadBtn=document.getElementById("downloadBtn"),statusDiv=document.getElementById("status"),gifPreview=document.getElementById("gifPreview"),iconPreview=document.getElementById("iconPreview"),gifFileName=document.getElementById("gifFileName"),iconFileName=document.getElementById("iconFileName"),flipBtn=document.getElementById("flipBtn"),fpsDecrementBtn=document.getElementById("fps-decrement"),fpsIncrementBtn=document.getElementById("fps-increment"),settingsModal=document.getElementById("settingsModal"),openSettingsBtn=document.getElementById("openSettingsBtn"),closeSettingsBtn=document.getElementById("closeSettingsBtn"),posXSlider=document.getElementById("posX"),posYSlider=document.getElementById("posY"),posZSlider=document.getElementById("posZ"),scaleSlider=document.getElementById("scale"),posXValue=document.getElementById("posXValue"),posYValue=document.getElementById("posYValue"),posZValue=document.getElementById("posZValue"),scaleValue=document.getElementById("scaleValue"),historyBtn=document.getElementById("historyBtn"),historyPanel=document.getElementById("historyPanel"),closeHistoryBtn=document.getElementById("closeHistoryBtn"),historyList=document.getElementById("historyList"),noHistoryMessage=document.getElementById("noHistoryMessage"),clearHistoryBtn=document.getElementById("clearHistoryBtn"),previewFpsBtn=document.getElementById("previewFpsBtn"),fpsPreviewContainer=document.getElementById("fpsPreviewContainer"),closePreviewBtn=document.getElementById("closePreviewBtn"),gifCanvas=document.getElementById("gifCanvas");
+        const gifFileInput=document.getElementById("gifFile"),packIconInput=document.getElementById("packIcon"),packNameInput=document.getElementById("packName"),packFpsInput=document.getElementById("packFps"),downloadBtn=document.getElementById("downloadBtn"),statusDiv=document.getElementById("status"),gifPreview=document.getElementById("gifPreview"),iconPreview=document.getElementById("iconPreview"),gifFileName=document.getElementById("gifFileName"),iconFileName=document.getElementById("iconFileName"),flipBtn=document.getElementById("flipBtn"),fpsDecrementBtn=document.getElementById("fps-decrement"),fpsIncrementBtn=document.getElementById("fps-increment"),settingsModal=document.getElementById("settingsModal"),openSettingsBtn=document.getElementById("openSettingsBtn"),closeSettingsBtn=document.getElementById("closeSettingsBtn"),posXSlider=document.getElementById("posX"),posYSlider=document.getElementById("posY"),posZSlider=document.getElementById("posZ"),scaleSlider=document.getElementById("scale"),posXValue=document.getElementById("posXValue"),posYValue=document.getElementById("posYValue"),posZValue=document.getElementById("posZValue"),scaleValue=document.getElementById("scaleValue"),historyBtn=document.getElementById("historyBtn"),historyPanel=document.getElementById("historyPanel"),historyList=document.getElementById("historyList"),noHistoryMessage=document.getElementById("noHistoryMessage"),clearHistoryBtn=document.getElementById("clearHistoryBtn"),previewFpsBtn=document.getElementById("previewFpsBtn"),fpsPreviewContainer=document.getElementById("fpsPreviewContainer"),closePreviewBtn=document.getElementById("closePreviewBtn"),gifCanvas=document.getElementById("gifCanvas");
         
         let extractedFrames=null, isFlipped=false, currentGifFile=null, currentIconFile=null, previewAnimationId=null, isPreviewing=false;
         
-        // --- LÓGICA DO BANCO DE DADOS (IndexedDB) ---
-        let db;
-        function initDB() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open('TotemCreatorDB', 1);
-                request.onupgradeneeded = e => { e.target.result.createObjectStore('history', { keyPath: 'id', autoIncrement: true }); };
-                request.onsuccess = e => { db = e.target.result; resolve(db); };
-                request.onerror = e => reject('Erro ao abrir IndexedDB:', e.target.errorCode);
-            });
-        }
+        const validateInputs=()=>{const e=extractedFrames&&currentIconFile&&packNameInput.value.trim()!==""&&packFpsInput.value.trim()!=="";downloadBtn.disabled=!e,downloadBtn.textContent=e?"Criar e Baixar .mcpack":"Preencha todos os campos"};
+        const handleGifUpload=async e=>{e&&(currentGifFile=e,gifPreview.src=URL.createObjectURL(e),gifFileName.textContent=e.name,gifFileName.classList.add("selected"),statusDiv.textContent="Analisando GIF...",statusDiv.style.color="var(--light-purple)",(async function(e){try{const t=await extractGifFrames(e);extractedFrames=t,statusDiv.textContent=`GIF carregado (${t.length} frames)`}catch(e){statusDiv.textContent=`Erro ao processar GIF: ${e.message}`,statusDiv.style.color="#f87171",extractedFrames=null}})(e),validateInputs())},handleIconUpload=e=>{e&&(currentIconFile=e,iconPreview.src=URL.createObjectURL(e),iconFileName.textContent=e.name,iconFileName.classList.add("selected"),validateInputs())};
+        gifFileInput.addEventListener("change",()=>handleGifUpload(gifFileInput.files[0])),packIconInput.addEventListener("change",()=>handleIconUpload(packIconInput.files[0])),packNameInput.addEventListener("keyup",validateInputs),packFpsInput.addEventListener("change",validateInputs),flipBtn.addEventListener("click",()=>{isFlipped=!isFlipped,flipBtn.classList.toggle("active"),gifPreview.classList.toggle("is-flipped")}),fpsDecrementBtn.addEventListener("click",()=>{packFpsInput.stepDown(),validateInputs()}),fpsIncrementBtn.addEventListener("click",()=>{packFpsInput.stepUp(),validateInputs()}),openSettingsBtn.addEventListener("click",()=>settingsModal.classList.add("is-open")),closeSettingsBtn.addEventListener("click",()=>settingsModal.classList.remove("is-open")),settingsModal.addEventListener("click",e=>{e.target===settingsModal&&settingsModal.classList.remove("is-open")});
+        const updateSliderValue=(e,t)=>{t.textContent=parseFloat(e.value).toFixed(1)};
+        posXSlider.addEventListener("input",()=>updateSliderValue(posXSlider,posXValue)),posYSlider.addEventListener("input",()=>updateSliderValue(posYSlider,posYValue)),posZSlider.addEventListener("input",()=>updateSliderValue(posZSlider,posZValue)),scaleSlider.addEventListener("input",()=>updateSliderValue(scaleSlider,scaleValue)),historyBtn.addEventListener("click",()=>{fpsPreviewContainer.classList.remove("is-visible"),historyPanel.classList.toggle("is-visible")}),clearHistoryBtn.addEventListener("click",()=>{confirm("Limpar todo o histórico?")&&(localStorage.removeItem("totemHistory"),renderHistory())});
         
-        async function saveToHistory(entry) {
-            if (!db) return;
-            const tx = db.transaction('history', 'readwrite');
-            const store = tx.objectStore('history');
-            const count = await new Promise(resolve => store.count().onsuccess = e => resolve(e.target.result));
-            if (count >= 5) { // Limita o histórico a 5 itens
-                let cursor = await new Promise(resolve => store.openCursor().onsuccess = e => resolve(e.target.result));
-                if (cursor) store.delete(cursor.primaryKey);
-            }
-            store.add(entry);
-            renderHistory();
-        }
-
-        async function getHistory() {
-            if (!db) return [];
-            const tx = db.transaction('history', 'readonly');
-            return new Promise(resolve => tx.objectStore('history').getAll().onsuccess = e => resolve(e.target.result.reverse()));
-        }
-
-        async function clearHistoryDB() {
-            if (!db) return;
-            const tx = db.transaction('history', 'readwrite');
-            await new Promise(resolve => tx.objectStore('history').clear().onsuccess = resolve);
-            renderHistory();
-        }
-
-        async function loadFromHistory(key) {
-            const tx = db.transaction('history', 'readonly');
-            const entry = await new Promise(resolve => tx.objectStore('history').get(key).onsuccess = e => resolve(e.target.result));
-            if (!entry) return;
-
-            packNameInput.value = entry.name;
-            packFpsInput.value = entry.fps;
+        const getHistory=()=>JSON.parse(localStorage.getItem("totemHistory")||"[]"),saveToHistory=e=>{let t=getHistory();t.unshift(e),t.length>20&&t.pop(),localStorage.setItem("totemHistory",JSON.stringify(t)),renderHistory()};
+        async function renderHistory(){const e=getHistory();historyList.innerHTML="",e.length?e.forEach((e,t)=>{const i=document.createElement("li");i.className="history-item",i.innerHTML=`<img src="${e.iconDataUrl}" alt="ícone"><span>${e.name}</span>`,i.addEventListener("click",()=>loadFromHistory(t)),historyList.appendChild(i)}):historyList.appendChild(noHistoryMessage)}
+        
+        async function loadFromHistory(index) {
+            const history = getHistory();
+            const item = history[index];
+            if (!item) return;
+            packNameInput.value = item.name;
+            packFpsInput.value = item.fps;
             
-            await handleGifUpload(new File([entry.gifFile], "history.gif", { type: "image/gif" }));
-            handleIconUpload(new File([entry.iconFile], "history.png", { type: "image/png" }));
+
+            const gifBlob = dataURLtoBlob(item.gifDataUrl);
+            const iconBlob = dataURLtoBlob(item.iconDataUrl);
+            const gifFile = new File([gifBlob], "history.gif", {type: "image/gif"});
+            const iconFile = new File([iconBlob], "history.png", {type: "image/png"});
+
+            await handleGifUpload(gifFile);
+            handleIconUpload(iconFile);
 
             historyPanel.classList.remove('is-visible');
         }
 
-        async function renderHistory() {
-            const history = await getHistory();
-            historyList.innerHTML = '';
-            if (history.length === 0) {
-                historyList.appendChild(noHistoryMessage);
-            } else {
-                history.forEach(item => {
-                    const li = document.createElement('li');
-                    li.className = 'history-item';
-                    li.innerHTML = `<img src="${URL.createObjectURL(item.iconFile)}" alt="ícone"><span>${item.name}</span>`;
-                    li.addEventListener('click', () => loadFromHistory(item.id));
-                    historyList.appendChild(li);
-                });
-            }
-        }
-        // --- FIM DA LÓGICA DO BANCO DE DADOS ---
-
-        const validateInputs = () => { const allFilled = extractedFrames && currentIconFile && packNameInput.value.trim() !== '' && packFpsInput.value.trim() !== ''; downloadBtn.disabled = !allFilled; downloadBtn.textContent = allFilled ? 'Criar e Baixar .mcpack' : 'Preencha todos os campos'; };
-        const handleGifUpload = async file => {
-            if (!file) return; currentGifFile = file;
-            gifPreview.src = URL.createObjectURL(file); gifFileName.textContent = file.name; gifFileName.classList.add('selected');
-            statusDiv.textContent = 'Analisando GIF...'; statusDiv.style.color = 'var(--light-purple)';
-            try {
-                extractedFrames = await extractGifFrames(file); statusDiv.textContent = `GIF carregado (${extractedFrames.length} frames)`;
-            } catch (error) { statusDiv.textContent = `Erro: ${error.message}`; statusDiv.style.color = '#f87171'; extractedFrames = null; }
-            validateInputs();
-        };
-        const handleIconUpload = file => { if (!file) return; currentIconFile = file; iconPreview.src = URL.createObjectURL(file); iconFileName.textContent = file.name; iconFileName.classList.add('selected'); validateInputs(); };
+        function startPreview(){if(!extractedFrames||0===extractedFrames.length)return void alert("Carregue um GIF primeiro.");historyPanel.classList.remove("is-visible"),isPreviewing=!0,fpsPreviewContainer.classList.add("is-visible");const e=gifCanvas.getContext("2d"),t=extractedFrames.map(e=>{const t=new Image;return t.src=e,t});let i=0,n=0;function a(o){if(isPreviewing){const s=parseFloat(packFpsInput.value)||20,d=1e3/s,r=o-n;r>d&&(n=o-r%d,img=t[i],gifCanvas.width===img.width&&gifCanvas.height===img.height||(gifCanvas.width=img.width,gifCanvas.height=img.height),e.clearRect(0,0,gifCanvas.width,gifCanvas.height),e.drawImage(img,0,0),i=(i+1)%t.length),previewAnimationId=requestAnimationFrame(a)}}cancelAnimationFrame(previewAnimationId),a(0)}
+        function stopPreview(){isPreviewing=!1,fpsPreviewContainer.classList.remove("is-visible"),previewAnimationId&&(cancelAnimationFrame(previewAnimationId),previewAnimationId=null)}
         
-        // Listeners
-        gifFileInput.addEventListener('change', () => handleGifUpload(gifFileInput.files[0]));
-        packIconInput.addEventListener('change', () => handleIconUpload(packIconInput.files[0]));
-        packNameInput.addEventListener('keyup', validateInputs); packFpsInput.addEventListener('change', validateInputs);
-        flipBtn.addEventListener("click", () => { isFlipped = !isFlipped; flipBtn.classList.toggle("active"); gifPreview.classList.toggle("is-flipped"); });
-        fpsDecrementBtn.addEventListener('click', () => { packFpsInput.stepDown(); validateInputs(); });
-        fpsIncrementBtn.addEventListener('click', () => { packFpsInput.stepUp(); validateInputs(); });
-        openSettingsBtn.addEventListener('click', () => settingsModal.classList.add("is-open"));
-        closeSettingsBtn.addEventListener('click', () => settingsModal.classList.remove("is-open"));
-        settingsModal.addEventListener('click', e => { if (e.target === settingsModal) settingsModal.classList.remove("is-open"); });
-
-        const updateSliderValue = (slider, display) => { display.textContent = parseFloat(slider.value).toFixed(1); };
-        ['posX', 'posY', 'posZ', 'scale'].forEach(id => {
-            const slider = document.getElementById(id), display = document.getElementById(id + 'Value');
-            slider.addEventListener('input', () => updateSliderValue(slider, display));
-        });
-
-        historyBtn.addEventListener('click', () => {
-            fpsPreviewContainer.classList.remove('is-visible');
-            historyPanel.classList.toggle('is-visible');
-        });
-        clearHistoryBtn.addEventListener('click', () => { if (confirm('Limpar todo o histórico?')) clearHistoryDB(); });
+        previewFpsBtn.addEventListener("click",startPreview),closePreviewBtn.addEventListener("click",stopPreview);
         
-        function startPreview() {
-            if (!extractedFrames?.length) { alert("Carregue um GIF primeiro."); return; }
-            historyPanel.classList.remove('is-visible');
-            isPreviewing = true; fpsPreviewContainer.classList.add('is-visible');
-            const ctx = gifCanvas.getContext('2d');
-            const frameImages = extractedFrames.map(src => { const img = new Image(); img.src = src; return img; });
-            let frameIndex = 0, lastTime = 0;
-            function animatePreview(timestamp) {
-                if (!isPreviewing) return;
-                const fps = parseFloat(packFpsInput.value) || 20, interval = 1000 / fps;
-                const deltaTime = timestamp - lastTime;
-                if (deltaTime > interval) {
-                    lastTime = timestamp - (deltaTime % interval);
-                    const img = frameImages[frameIndex];
-                    if (gifCanvas.width !== img.width || gifCanvas.height !== img.height) { gifCanvas.width = img.width; gifCanvas.height = img.height; }
-                    ctx.clearRect(0, 0, gifCanvas.width, gifCanvas.height);
-                    ctx.drawImage(img, 0, 0);
-                    frameIndex = (frameIndex + 1) % frameImages.length;
-                }
-                previewAnimationId = requestAnimationFrame(animatePreview);
-            }
-            cancelAnimationFrame(previewAnimationId);
-            animatePreview(0);
-        }
-        function stopPreview() {
-            isPreviewing = false; fpsPreviewContainer.classList.remove('is-visible');
-            if (previewAnimationId) { cancelAnimationFrame(previewAnimationId); previewAnimationId = null; }
-        }
-        
-        previewFpsBtn.addEventListener('click', startPreview);
-        closePreviewBtn.addEventListener('click', stopPreview);
-
         async function extractGifFrames(e){return new Promise((t,i)=>{const n=new FileReader;n.onload=e=>{try{const i=new GIF(e.target.result),n=i.decompressFrames(!0),a=i.hdr;if(!n||0===n.length||!a)throw new Error("GIF inválido ou corrompido.");const o=document.createElement("canvas");o.width=a.width,o.height=a.height;const s=o.getContext("2d"),d=[];for(const r of n){2===r.disposal&&s.clearRect(0,0,a.width,a.height);const l=document.createElement("canvas");l.width=r.dims.width,l.height=r.dims.height;const c=l.getContext("2d"),h=c.createImageData(r.dims.width,r.dims.height);h.data.set(r.patch),c.putImageData(h,0,0),s.drawImage(l,r.dims.left,r.dims.top),d.push(o.toDataURL("image/png"))}t(d)}catch(e){i(e)}},n.onerror=i,n.readAsArrayBuffer(e)})}
         async function flipFrames(e){return Promise.all(e.map(e=>new Promise((t,i)=>{const n=new Image;n.onload=()=>{const i=document.createElement("canvas");i.width=n.width,i.height=n.height;const a=i.getContext("2d");a.translate(n.width,0),a.scale(-1,1),a.drawImage(n,0,0),t(i.toDataURL("image/png"))},n.onerror=i,n.src=e})))}
+        function fileToDataURL(e){return new Promise((t,i)=>{const n=new FileReader;n.onload=()=>t(n.result),n.onerror=i,n.readAsDataURL(e)})}
         function dataURLtoBlob(e){const[t,i]=e.split(","),n=t.match(/:(.*?);/)[1],a=atob(i);let o=a.length;const s=new Uint8Array(o);for(;o--;)s[o]=a.charCodeAt(o);return new Blob([s],{type:n})}
         
         downloadBtn.addEventListener('click', async () => {
             statusDiv.textContent = 'Iniciando...'; statusDiv.style.color = 'var(--light-purple)'; downloadBtn.disabled = true;
             try {
-                await saveToHistory({ name: packNameInput.value, fps: packFpsInput.value, gifFile: currentGifFile, iconFile: currentIconFile });
+                await saveToHistory({ name: packNameInput.value, fps: packFpsInput.value, gifDataUrl: await fileToDataURL(currentGifFile), iconDataUrl: await fileToDataURL(currentIconFile) });
                 
                 let framesToProcess = extractedFrames; if (isFlipped) { framesToProcess = await flipFrames(extractedFrames); }
                 statusDiv.textContent = 'Gerando arquivos...';
@@ -284,6 +183,7 @@
                 const content = await zip.generateAsync({ type: 'blob' });
                 const link = document.createElement('a'); link.href = URL.createObjectURL(content); link.download = `${packNameSanitized || 'totem_animado'}.mcpack`;
                 document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                
                 statusDiv.textContent = `Pacote '${link.download}' criado com sucesso!`; statusDiv.style.color = '#4ade80';
             } catch (error) { console.error(error); statusDiv.textContent = `Erro: ${error.message}`; statusDiv.style.color = '#f87171'; } finally { validateInputs(); }
         });
