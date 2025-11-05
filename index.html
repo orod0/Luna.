@@ -103,7 +103,6 @@
             line-height: 1.6;
         }
         
-        /* ESTILO 'DISABLED' RESTAURADO E FUNCIONAL */
         .hub-card.disabled {
             filter: grayscale(80%);
             opacity: 0.7;
@@ -114,42 +113,23 @@
             border-color: var(--border-color);
             box-shadow: none;
         }
-
-        /* SOBREPOSIÇÃO 'EM BREVE' COM BLUR */
         .soon-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(10, 10, 16, 0.5);
-            backdrop-filter: blur(4px);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            opacity: 0; /* Começa invisível */
-            transition: opacity 0.3s ease;
-            pointer-events: none; /* Garante que o cursor 'not-allowed' do pai funcione */
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%; background-color: rgba(10, 10, 16, 0.5);
+            backdrop-filter: blur(4px); border-radius: 20px; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 1.8rem; font-weight: 700; color: var(--text-primary);
+            opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
         }
-        .hub-card.disabled:hover .soon-overlay {
-             opacity: 1; /* Aparece ao passar o mouse SOBRE O CARD DESABILITADO */
-        }
+        .hub-card.disabled:hover .soon-overlay { opacity: 1; }
 
         .page-transition {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: var(--deep-purple);
             z-index: 9999; transform-origin: bottom; pointer-events: none;
         }
-        .page-transition.animate-in {
-            transform: scaleY(1); animation: slideIn 0.5s ease-in-out forwards;
-        }
-        .page-transition.animate-out {
-            transform: scaleY(0); animation: slideOut 0.5s ease-in-out forwards;
-        }
+        .page-transition.animate-in { transform: scaleY(1); animation: slideIn 0.5s ease-in-out forwards; }
+        .page-transition.animate-out { transform: scaleY(0); animation: slideOut 0.5s ease-in-out forwards; }
         @keyframes slideIn { from { transform: scaleY(1); transform-origin: top; } to { transform: scaleY(0); transform-origin: top; } }
         @keyframes slideOut { from { transform: scaleY(0); transform-origin: bottom; } to { transform: scaleY(1); transform-origin: bottom; } }
 
@@ -182,13 +162,12 @@
 
         <div class="hub-grid">
             
-            <!-- AQUI ESTÁ A CORREÇÃO: ADICIONADA A CLASSE 'disabled' NOVAMENTE -->
-            <div class="hub-card disabled">
+            <!-- ### BOTÃO DESBLOQUEADO AQUI ### -->
+            <a href="texture-hub.html" class="hub-card nav-link">
                 <div class="icon"><i class="fas fa-palette"></i></div>
                 <h2>Texture Hub</h2>
                 <p>Navegue em uma biblioteca de texturas totalmente grátis para mudar aparência do seu jogo.</p>
-                <div class="soon-overlay">Em Breve</div>
-            </div>
+            </a>
             
             <a href="totem-maker.html" class="hub-card nav-link">
                 <div class="icon"><i class="fas fa-wand-magic-sparkles"></i></div>
@@ -200,6 +179,7 @@
                 <div class="icon"><i class="fas fa-gears"></i></div>
                 <h2>Em Breve</h2>
                 <p>Novas ferramentas estão a caminho.</p>
+                <div class="soon-overlay">Em Breve</div>
             </div>
         </div>
     </div>
